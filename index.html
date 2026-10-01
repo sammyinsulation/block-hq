@@ -1204,7 +1204,7 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
     [$(".pname",card),$(".ava",card)].forEach(function(x){x.addEventListener("click",function(e){silly(p,e);});});});
 
   /* Exercise check-offs (once a day each) */
-  var EXER={tyson:[["💪","Push-ups"],["🔥","Crunches"],["🦵","Squats"]],riyek:[["🤸","Trampoline"],["🚲","Bike"],["🛼","Rollerblade"],["🛴","Scooter"]]};
+  var EXER={tyson:[["💪","Push-ups"],["🔥","Crunches"],["🦵","Squats"]],riyek:[["🤸","Jumping jacks"],["👣","Touch toes"],["🧘","Stretch"]]};
   function exDay(){if(!S.exer||S.exer.date!==todayIso())S.exer={date:todayIso(),tyson:{},riyek:{},bonus:{}};return S.exer;}
   function renderEx(){var d=exDay();["tyson","riyek"].forEach(function(p){var box=$('[data-exp="'+p+'"]');if(!box)return;box.textContent="";
       EXER[p].forEach(function(x){var on=!!d[p][x[1]],b=el("button","exb"+(on?" on":""));b.appendChild(el("span","eic",on?"✅":x[0]));b.appendChild(document.createTextNode(x[1]));
