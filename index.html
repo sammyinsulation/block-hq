@@ -335,8 +335,8 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
         <button type="button" class="chip" data-w="tyson" aria-pressed="true">Tyson</button>
         <button type="button" class="chip" data-w="riyek" aria-pressed="true">Riyek</button>
       </div>
-      <form class="addrow"><input placeholder="New quest" aria-label="Add quest" maxlength="60"><button>Add</button></form>
-      <button class="clear" type="button">Clear finished</button>
+      <form class="addrow"><input placeholder="New quest" aria-label="Add quest" maxlength="60"><button>🔒 Add</button></form>
+      <button class="clear" type="button">🔒 Clear finished</button>
     </div>
   </section>
 
@@ -430,6 +430,13 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   <div class="row"><button class="ghost" data-close>Done</button><button class="primary" id="evAdd">Add</button></div>
 </dialog>
 
+<dialog id="pwDlg">
+  <h3>🔒 Parent password</h3>
+  <input id="pwIn" type="password" autocomplete="off" aria-label="Parent password">
+  <p id="pwErr" hidden style="color:#FF3B3B;font-weight:700;margin:10px 0 0">Nope, that's not it.</p>
+  <div class="row"><button class="ghost" id="pwCancel">Cancel</button><button class="primary" id="pwOk">Unlock</button></div>
+</dialog>
+
 <dialog id="setDlg">
   <h3>Settings</h3>
   <label for="sClock">Clock</label><select id="sClock"><option value="12">12-hour</option><option value="24">24-hour</option></select>
@@ -497,7 +504,6 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     "$10 gift card for your favourite game",
     "Dollar store trip with $10",
     "Pick a restaurant for dinner",
-    "Friend sleepover",
     "Breakfast in bed, made by Mom or Dad",
     "New building or Lego set (about $25)",
     "Trampoline park or laser tag trip",
@@ -505,6 +511,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     "Pick a weekend family adventure",
     "New video game (about $60)",
     "Big day out: you plan the whole day"];
+  if(S.prizes)S.prizes=S.prizes.filter(function(x){return !/sleep\s*over/i.test(x);});
   function prizeList(){return (S.prizes&&S.prizes.length)?S.prizes:PRIZE_IDEAS;}
   function prizeName(i){var l=prizeList();return l[i]||"Mystery prize (parent's choice)";}
   function renderPrizes(){
@@ -638,10 +645,20 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
         ks.appendChild(b);});
       row.appendChild(ks);li.appendChild(row);ul.appendChild(li);});
     $(".clear",root).hidden=!S[QT].some(isDone);countTabs();}
+  /* Parent password */
+  var pwUntil=0,pwNext=null;
+  function pwHash(t){var x=5381;t=String(t).trim().toLowerCase();for(var i=0;i<t.length;i++)x=((Math.imul?Math.imul(x,33):x*33)^t.charCodeAt(i))>>>0;return x;}
+  function needPw(cb){if(Date.now()<pwUntil){cb();return;}pwNext=cb;$("#pwIn").value="";$("#pwErr").hidden=true;$("#pwDlg").showModal();setTimeout(function(){$("#pwIn").focus();},50);}
+  function tryPw(){if(pwHash($("#pwIn").value)===2418228710){pwUntil=Date.now()+5*60000;$("#pwDlg").close();var c=pwNext;pwNext=null;if(c)c();}
+    else{$("#pwErr").hidden=false;$("#pwIn").value="";$("#pwIn").focus();}}
+  $("#pwOk").addEventListener("click",tryPw);
+  $("#pwIn").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();tryPw();}});
+  $("#pwCancel").addEventListener("click",function(){pwNext=null;$("#pwDlg").close();});
   ["todo"].forEach(function(name){var root=$('[data-list="'+name+'"]');
-    $("form",root).addEventListener("submit",function(e){e.preventDefault();var inp=$("input",root),t=inp.value.trim();if(!t)return;var o={id:uid(),text:t,done:false};
-      if(name==="todo"){o.who=["tyson","riyek"].filter(function(w){return whoSel[w];});o.doneBy={};}S[QT].push(o);inp.value="";save();renderList(name);});
-    $(".clear",root).addEventListener("click",function(){S[QT]=S[QT].filter(function(i){return !isDone(i);});save();renderList(name);});renderList(name);});
+    $("form",root).addEventListener("submit",function(e){e.preventDefault();var inp=$("input",root),t=inp.value.trim();if(!t)return;
+      needPw(function(){var o={id:uid(),text:t,done:false};
+      if(name==="todo"){o.who=["tyson","riyek"].filter(function(w){return whoSel[w];});o.doneBy={};}S[QT].push(o);inp.value="";save();renderList(name);});});
+    $(".clear",root).addEventListener("click",function(){needPw(function(){S[QT]=S[QT].filter(function(i){return !isDone(i);});save();renderList(name);});});renderList(name);});
 
   /* Calendar */
   var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -724,8 +741,9 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   }
 
   /* Settings */
-  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sPrizes").value=prizeList().join("\n");$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
-    $("#sNightOn").value=S.night;$("#sFrom").value=S.from;$("#sTo").value=S.to;$("#setDlg").showModal();});
+  $("#setBtn").addEventListener("click",function(){needPw(openSettings);});
+  function openSettings(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sPrizes").value=prizeList().join("\n");$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
+    $("#sNightOn").value=S.night;$("#sFrom").value=S.from;$("#sTo").value=S.to;$("#setDlg").showModal();}
   $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;S.alarmOn=$("#sAlarmOn").value;S.prizes=$("#sPrizes").value.split("\n").map(function(x){return x.trim();}).filter(Boolean);renderPrizes();S.alarmT=$("#sAlarmT").value||"08:00";S.jj=$("#sJJ").value;S.jjT=$("#sJJT").value;showSnd();
     S.night=$("#sNightOn").value;S.from=$("#sFrom").value||"21:30";S.to=$("#sTo").value||"06:30";save();applyTheme();tick();setBg();renderCal();$("#capTxt").textContent=S.cap;$("#setDlg").close();});
   $$("[data-bonus]").forEach(function(b){b.addEventListener("click",function(){$("#setDlg").close();addXP(b.getAttribute("data-bonus"),25,"Bonus!");});});
