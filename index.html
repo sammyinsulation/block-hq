@@ -504,14 +504,13 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     "$10 gift card for your favourite game",
     "Dollar store trip with $10",
     "Pick a restaurant for dinner",
-    "Breakfast in bed, made by Mom or Dad",
     "New building or Lego set (about $25)",
     "Trampoline park or laser tag trip",
     "No chores for a whole week",
     "Pick a weekend family adventure",
     "New video game (about $60)",
     "Big day out: you plan the whole day"];
-  if(S.prizes)S.prizes=S.prizes.filter(function(x){return !/sleep\s*over/i.test(x);});
+  if(S.prizes)S.prizes=S.prizes.filter(function(x){return !/sleep\s*over|breakfast in bed/i.test(x);});
   function prizeList(){return (S.prizes&&S.prizes.length)?S.prizes:PRIZE_IDEAS;}
   function prizeName(i){var l=prizeList();return l[i]||"Mystery prize (parent's choice)";}
   function renderPrizes(){
