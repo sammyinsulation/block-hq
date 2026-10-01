@@ -123,6 +123,28 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .clear{border:0;background:none;color:var(--muted);padding:12px 0 2px;font-size:16px;text-decoration:underline}
 .empty{color:var(--muted);font-size:19px;padding:8px 2px}
 
+/* Reminders */
+.jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
+@keyframes jjpulse{50%{transform:scale(1.015)}}
+.jj b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,40px);line-height:1;color:var(--yellow);text-shadow:3px 3px 0 #000}
+.jj span{font-weight:700;font-size:18px}
+.belt{flex:none;position:relative;width:86px;height:70px;background:#fff;border-radius:6px;box-shadow:inset 0 -8px 0 #C9D1E6;transform:rotate(-6deg)}
+.belt::before{content:"";position:absolute;left:-8px;right:-8px;top:28px;height:14px;background:var(--grape);box-shadow:0 3px 0 #4A2BA8}
+.belt i{position:absolute;left:34px;top:22px;width:18px;height:26px;background:var(--grape);box-shadow:-10px 18px 0 -4px var(--grape),10px 18px 0 -4px var(--grape)}
+.ev.jj{background:var(--grape)}
+.alarm{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:24px;background:rgba(255,212,0,.94)}
+.acard{width:min(720px,94vw);text-align:center;color:var(--ink)}
+.aclock{font-size:clamp(90px,18vw,170px);line-height:1;animation:shake .35s ease-in-out infinite}
+@keyframes shake{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.acard h2{font-family:var(--display);font-weight:400;font-size:clamp(40px,7.5vw,78px);line-height:1;margin:14px 0 8px;color:#fff;text-shadow:4px 4px 0 var(--ink),8px 8px 0 rgba(0,0,0,.2)}
+.acard h2 .t{color:var(--blue)} .acard h2 .r{color:var(--orange)}
+.acard p{font-size:clamp(22px,3.4vw,32px);font-weight:700;margin:0 0 18px}
+.achk{list-style:none;padding:0;margin:0 0 26px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.achk li{background:#fff;padding:10px 16px;border-radius:4px;font-weight:700;font-size:20px;box-shadow:0 5px 0 #B89800}
+#alarmOk{border:0;border-radius:6px;padding:22px 34px;background:var(--green);color:#fff;font-family:var(--display);font-size:clamp(24px,4vw,36px);box-shadow:0 8px 0 #178A31}
+#alarmOk:active{transform:translateY(6px);box-shadow:0 2px 0 #178A31}
+.sndbtn{position:fixed;right:16px;bottom:100px;z-index:60;border:0;border-radius:6px;padding:12px 16px;background:var(--ink);color:#fff;font-weight:700;font-size:16px;box-shadow:0 6px 0 #000}
+
 /* Calendar */
 .cal h2{margin:0;color:var(--red);text-shadow:2px 2px 0 #A51F1F;text-align:center;flex:1}
 .calhead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -242,6 +264,11 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     </div>
   </header>
 
+  <div class="jj" id="jjBanner" hidden>
+    <div class="belt" aria-hidden="true"><i></i></div>
+    <div><b>Jiu-jitsu today!</b><span id="jjSub">Pack your gi and water bottle</span></div>
+  </div>
+
   <button class="play press" id="playBtn">
     <div class="cube">▶</div>
     <div><b>Play Block Dash</b><span id="playSub">Run, jump, grab coins, earn XP</span></div>
@@ -329,6 +356,16 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
 </div>
 
 <div class="burst" id="burst"></div>
+<div class="alarm" id="alarm" hidden>
+  <div class="acard">
+    <div class="aclock" aria-hidden="true">⏰</div>
+    <h2>Wake up, <span class="t">Tyson</span> &amp; <span class="r">Riyek</span>!</h2>
+    <p>Time to get ready for school!</p>
+    <ul class="achk"><li>Dressed</li><li>Teeth brushed</li><li>Backpack packed</li><li>Shoes on</li></ul>
+    <button id="alarmOk">We're getting ready!</button>
+  </div>
+</div>
+<button class="sndbtn" id="sndBtn" hidden>🔇 Tap anywhere to turn on the alarm sound</button>
 <div class="night" id="night"><div><div class="t" id="nTime"></div><div class="d" id="nDate"></div></div></div>
 
 <dialog id="noteDlg">
@@ -367,6 +404,11 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   <label for="sTheme">Look</label><select id="sTheme"><option value="auto">Match device</option><option value="light">Daytime</option><option value="dark">Night</option></select>
   <label for="sCap">Most XP from the game per day, each</label><select id="sCap"><option>10</option><option>20</option><option>30</option><option>50</option><option>100</option></select>
   <label for="sGrace">Game touch help (extra time to react on a laggy screen)</label><select id="sGrace"><option value="90">A little</option><option value="160">Normal</option><option value="260">Lots</option></select>
+  <label for="sAlarmOn">School alarm (silly voice, Monday to Friday)</label>
+  <div style="display:flex;gap:10px"><select id="sAlarmOn" style="flex:1"><option value="on">On</option><option value="off">Off</option></select><input id="sAlarmT" type="time" style="flex:1"></div>
+  <div class="bonus" style="margin-top:10px"><button type="button" id="sTest">Test the alarm now</button></div>
+  <label for="sJJ">Jiu-jitsu reminder (Tuesdays and Thursdays)</label>
+  <div style="display:flex;gap:10px"><select id="sJJ" style="flex:1"><option value="on">On</option><option value="off">Off</option></select><input id="sJJT" type="time" aria-label="Class time (optional)" style="flex:1"></div>
   <label for="sNightOn">Night clock (dims to a clock only)</label>
   <select id="sNightOn"><option value="off">Off</option><option value="on">On</option></select>
   <label>From / until</label>
@@ -384,7 +426,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   var RANKS=["Noob builder","Block hopper","Obby runner","Coin collector","Pro builder","Speed legend","Ultimate champion"];
   var PC={tyson:{name:"Tyson",c:"#2F80FF",d:"#1A4FA8"},riyek:{name:"Riyek",c:"#FF8A00",d:"#A85A00"}};
   var defaults={clock:"12",theme:"auto",anim:"off",night:"off",from:"21:30",to:"06:30",cap:"30",
-    grace:"160",events:[],side:[],players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
+    grace:"160",events:[],side:[],alarmOn:"on",alarmT:"08:00",lastAlarm:"",jj:"on",jjT:"",players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
     notes:[{id:1,text:"Tap a note to take it down",c:0,from:""}],counts:[],grocery:[],todo:[]};
   var S=load();
 
@@ -448,6 +490,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     $("#nTime").textContent=f.t+(f.ap?" "+f.ap:"");$("#nDate").textContent=ds;
     $("#night").classList.toggle("on",inNight(d)&&Date.now()>woke&&$("#game").hidden);
     if(d.getDate()!==lastDay){lastDay=d.getDate();renderCounts();if(window.__calReady)renderCal();}
+    if(window.__remReady)checkReminders(d);
   }
   $("#night").addEventListener("click",function(){woke=Date.now()+300000;tick();});
 
@@ -526,8 +569,8 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       if(i>=35&&d.getMonth()!==calM)break;
       var b=el("button","day"+(d.getMonth()!==calM?" out":"")+(k===tk?" today":""));
       b.appendChild(el("span","n",String(d.getDate())));
-      var ev=evsOn(k);ev.slice(0,2).forEach(function(e){b.appendChild(el("span","ev "+e.who,e.text));});
-      if(ev.length>2)b.appendChild(el("span","more","+"+(ev.length-2)+" more"));
+      var ev=evsOn(k),isJJ=S.jj==="on"&&(d.getDay()===2||d.getDay()===4);if(isJJ)b.appendChild(el("span","ev jj","Jiu-jitsu"+(S.jjT?" "+fmtT(S.jjT):"")));ev.slice(0,isJJ?1:2).forEach(function(e){b.appendChild(el("span","ev "+e.who,e.text));});
+      if(ev.length>(isJJ?1:2))b.appendChild(el("span","more","+"+(ev.length-(isJJ?1:2))+" more"));
       b.setAttribute("aria-label",d.toDateString()+(ev.length?", "+ev.length+" item"+(ev.length>1?"s":""):""));
       (function(key,dt){b.addEventListener("click",function(){openDayDlg(key,dt);});})(k,d);
       g.appendChild(b);
@@ -554,10 +597,46 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   $("#calNext").addEventListener("click",function(){calM++;if(calM>11){calM=0;calY++;}renderCal();});
   $("#calToday").addEventListener("click",function(){var d=new Date();calY=d.getFullYear();calM=d.getMonth();renderCal();});
 
+  /* Reminders: school alarm + jiu-jitsu */
+  var AC=null,unlocked=false,alarmRep=null,alarmCount=0;
+  var LINES=[
+    "Attention Tyson and Riyek! This is your fridge speaking. It is time to get ready for school! Shoes on, backpacks packed, let's go!",
+    "Beep boop! Fridge alert! Tyson! Riyek! School time is coming! Get dressed, brush those teeth, and move it move it!",
+    "Good morning, block builders! Your mission, should you choose to accept it: get ready for school! Go go go!",
+    "Hey hey hey! It's eight o'clock! Tyson and Riyek, this fridge says get ready for school, or no snacks for you! Just kidding. But hurry up!"];
+  function unlock(){if(unlocked)return;unlocked=true;
+    try{var C=window.AudioContext||window.webkitAudioContext;if(C){AC=new C();if(AC.resume)AC.resume();}}catch(e){}
+    try{if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}}catch(e){}
+    $("#sndBtn").hidden=true;}
+  document.addEventListener("pointerdown",unlock,true);document.addEventListener("touchstart",unlock,true);document.addEventListener("keydown",unlock,true);
+  function showSnd(){$("#sndBtn").hidden=unlocked||S.alarmOn!=="on";}
+  function boing(){if(!AC)return;try{var t=AC.currentTime;
+    [[330,880],[880,260],[392,1046],[1046,330]].forEach(function(f,i){var o=AC.createOscillator(),g=AC.createGain();o.type="square";
+      o.frequency.setValueAtTime(f[0],t+i*.18);o.frequency.exponentialRampToValueAtTime(f[1],t+i*.18+.16);
+      g.gain.setValueAtTime(.0001,t+i*.18);g.gain.exponentialRampToValueAtTime(.25,t+i*.18+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.18+.17);
+      o.connect(g);g.connect(AC.destination);o.start(t+i*.18);o.stop(t+i*.18+.2);});}catch(e){}}
+  function sayLine(){try{if(!window.speechSynthesis)return;speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(LINES[Math.floor(Math.random()*LINES.length)]);u.pitch=1.9;u.rate=1.1;u.volume=1;
+    var vs=speechSynthesis.getVoices().filter(function(v){return /^en/i.test(v.lang);});if(vs.length)u.voice=vs[0];
+    speechSynthesis.speak(u);}catch(e){}}
+  function ring(){boing();setTimeout(sayLine,850);}
+  function fireAlarm(){woke=Date.now()+3600000;$("#night").classList.remove("on");$("#alarm").hidden=false;alarmCount=1;ring();
+    clearInterval(alarmRep);alarmRep=setInterval(function(){if($("#alarm").hidden||alarmCount>=4){clearInterval(alarmRep);return;}alarmCount++;ring();},40000);}
+  $("#alarmOk").addEventListener("click",function(){clearInterval(alarmRep);try{speechSynthesis.cancel();}catch(e){}$("#alarm").hidden=true;confetti("#2BC24A");});
+  $("#sTest").addEventListener("click",function(){$("#setDlg").close();unlock();fireAlarm();});
+  function mins(t){var a=(t||"0:0").split(":");return (+a[0])*60+(+a[1]);}
+  function checkReminders(d){
+    var dow=d.getDay(),now=d.getHours()*60+d.getMinutes(),k=todayIso();
+    if(S.alarmOn==="on"&&dow>=1&&dow<=5&&S.lastAlarm!==k&&now>=mins(S.alarmT)&&now<mins(S.alarmT)+3){S.lastAlarm=k;save();fireAlarm();}
+    var jj=S.jj==="on"&&(dow===2||dow===4)&&(!S.jjT||now<mins(S.jjT)+90);
+    $("#jjBanner").hidden=!jj;
+    if(jj)$("#jjSub").textContent=(S.jjT?"Class at "+fmtT(S.jjT)+". ":"")+"Pack your gi and water bottle!";
+  }
+
   /* Settings */
-  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;
+  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
     $("#sNightOn").value=S.night;$("#sFrom").value=S.from;$("#sTo").value=S.to;$("#setDlg").showModal();});
-  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;
+  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;S.alarmOn=$("#sAlarmOn").value;S.alarmT=$("#sAlarmT").value||"08:00";S.jj=$("#sJJ").value;S.jjT=$("#sJJT").value;showSnd();
     S.night=$("#sNightOn").value;S.from=$("#sFrom").value||"21:30";S.to=$("#sTo").value||"06:30";save();applyTheme();tick();setBg();renderCal();$("#capTxt").textContent=S.cap;$("#setDlg").close();});
   $$("[data-bonus]").forEach(function(b){b.addEventListener("click",function(){$("#setDlg").close();addXP(b.getAttribute("data-bonus"),25,"Bonus!");});});
   $("#sReset").addEventListener("click",function(){if(confirm("Reset Tyson's and Riyek's XP and best runs?")){["tyson","riyek"].forEach(function(p){S.players[p]={xp:0,best:0};});save();renderXP();$("#setDlg").close();}});
@@ -690,7 +769,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   $("#endRun").addEventListener("click",function(){$("#gPause").hidden=true;crash();});
   document.addEventListener("visibilitychange",function(){if(document.hidden&&G.state==="run"){G.state="paused";$("#gPause").hidden=false;}});
 
-  window.__calReady=1;setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
+  window.__calReady=1;window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
 })();
 </script>
