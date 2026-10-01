@@ -214,6 +214,13 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .dbtn:active{transform:translateY(3px)}
 @media (max-width:700px){.wx{grid-template-columns:1fr}}
 
+/* Silly sounds */
+.pname,.player .ava{cursor:pointer;-webkit-user-select:none;user-select:none}
+.wig{animation:wig .5s ease-in-out}
+@keyframes wig{20%{transform:rotate(-8deg) scale(1.15)}40%{transform:rotate(7deg) scale(1.1)}60%{transform:rotate(-5deg)}80%{transform:rotate(3deg)}}
+.sfxbub{position:fixed;z-index:85;pointer-events:none;font-family:var(--display);font-size:28px;color:#fff;text-shadow:2px 2px 0 var(--ink),4px 4px 0 var(--ink);animation:bub 1s ease-out forwards;white-space:nowrap}
+@keyframes bub{from{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-20px) scale(1.15);opacity:1}to{transform:translate(-50%,-90px) scale(1);opacity:0}}
+
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
 @keyframes jjpulse{50%{transform:scale(1.015)}}
@@ -903,6 +910,40 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     try{fetch(WX_URL).then(function(r){return r.json();}).then(function(j){if(!j||!j.current)throw 0;S.wxCache={t:Date.now(),data:j};save();renderWx(j);})
       .catch(function(){if(!S.wxCache)renderWx(null);});}catch(e){if(!S.wxCache)renderWx(null);}}
   setInterval(loadWx,30*60000);
+
+  /* Silly sounds when tapping a name or avatar */
+  function tone(type,f0,f1,t0,dur,vol){var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;o.type=type;
+    o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.25,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.05);return o;}
+  function noise(t0,dur,vol,hp){var n=AC.sampleRate*dur,buf=AC.createBuffer(1,n,AC.sampleRate),d=buf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;
+    var src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),t=AC.currentTime+t0;src.buffer=buf;f.type="highpass";f.frequency.value=hp||1500;
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);src.connect(f);f.connect(g);g.connect(AC.destination);src.start(t);}
+  var SFX=[
+    ["BOING!",function(){var o=tone("sine",150,700,0,.25,.35);tone("sine",700,140,.25,.45,.3);}],
+    ["WHEEE!",function(){tone("sine",350,1800,0,.7,.25);}],
+    ["WHOOPS!",function(){tone("sine",1800,250,0,.7,.25);}],
+    ["PEW PEW!",function(){for(var i=0;i<3;i++)tone("square",1400,180,i*.16,.14,.15);}],
+    ["BEEP BOOP!",function(){for(var i=0;i<7;i++){var f=300+Math.random()*900;tone("square",f,f,i*.09,.08,.12);}}],
+    ["PFFFT!",function(){var o=AC.createOscillator(),l=AC.createOscillator(),lg=AC.createGain(),g=AC.createGain(),f=AC.createBiquadFilter(),t=AC.currentTime;
+      o.type="sawtooth";o.frequency.setValueAtTime(95,t);o.frequency.linearRampToValueAtTime(65,t+.8);l.frequency.value=28;lg.gain.value=.18;
+      f.type="lowpass";f.frequency.value=700;g.gain.setValueAtTime(.3,t);g.gain.linearRampToValueAtTime(.0001,t+.85);
+      l.connect(lg);lg.connect(g.gain);o.connect(f);f.connect(g);g.connect(AC.destination);o.start(t);l.start(t);o.stop(t+.9);l.stop(t+.9);}],
+    ["HONK HONK!",function(){[0,.4].forEach(function(t){tone("sawtooth",220,210,t,.3,.18);tone("sawtooth",233,224,t,.3,.18);});}],
+    ["BA-DUM-TSS!",function(){tone("sine",180,90,0,.15,.4);tone("sine",140,70,.18,.15,.4);noise(.38,.45,.35,6000);}],
+    ["SQUEAK!",function(){tone("sine",1500,2300,0,.12,.25);tone("sine",2300,1600,.14,.14,.25);}],
+    ["BOINGOING!",function(){for(var i=0;i<5;i++)tone("sine",200+i*80,900+i*150,i*.12,.12,.2);}]];
+  var SAYS=["{n} is the coolest!","{n}! {n}! {n}!","Bananas!","Beep boop. I am a fridge.","Hey {n}, stop poking me!","Who farted?","{n} has the zoomies!","Cheese!"];
+  var lastSfx=-1;
+  function silly(p,e){unlock();var card=$('.player[data-p="'+p+'"]');
+    [$(".pname",card),$(".ava",card)].forEach(function(x){x.classList.remove("wig");void x.offsetWidth;x.classList.add("wig");});
+    var label;
+    if(Math.random()<.2&&window.speechSynthesis){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(SAYS[Math.floor(Math.random()*SAYS.length)].replace(/\{n\}/g,PC[p].name));u.pitch=2;u.rate=1.25;speechSynthesis.speak(u);label="💬";}catch(x){}}
+    if(!label){var i;do{i=Math.floor(Math.random()*SFX.length);}while(i===lastSfx);lastSfx=i;label=SFX[i][0];if(AC){try{if(AC.resume)AC.resume();SFX[i][1]();}catch(x){}}}
+    var b=el("div","sfxbub",label);var r=$(".pname",card).getBoundingClientRect();b.style.left=(r.left+r.width/2)+"px";b.style.top=(r.top-10)+"px";b.style.color=PC[p].c;
+    document.body.appendChild(b);setTimeout(function(){b.remove();},1000);}
+  ["tyson","riyek"].forEach(function(p){var card=$('.player[data-p="'+p+'"]');
+    [$(".pname",card),$(".ava",card)].forEach(function(x){x.addEventListener("click",function(e){silly(p,e);});});});
 
   /* Settings */
   $("#setBtn").addEventListener("click",function(){needPw(openSettings);});
