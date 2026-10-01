@@ -123,6 +123,32 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .clear{border:0;background:none;color:var(--muted);padding:12px 0 2px;font-size:16px;text-decoration:underline}
 .empty{color:var(--muted);font-size:19px;padding:8px 2px}
 
+/* Prize road */
+.wrap>*{min-width:0}
+.prizes{padding:20px 20px 14px}
+.prizes h2{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:30px;color:var(--grape);text-shadow:2px 2px 0 #4A2BA8}
+.prizes .sub{color:var(--muted);font-size:15px;margin:0 0 12px}
+.prow{margin-top:14px;--pc:var(--blue);--pd:#1A4FA8}
+.prow[data-p="riyek"]{--pc:var(--orange);--pd:#A85A00}
+.pnext{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;font-weight:700;font-size:18px}
+.pnext b{font-family:var(--display);font-weight:400;font-size:24px;color:var(--pc);text-shadow:2px 2px 0 var(--pd)}
+.pnext .togo{color:var(--muted);font-size:15px}
+.pbar{height:16px;margin:8px 0 10px;background:var(--well);border-radius:4px;overflow:hidden;box-shadow:inset 0 3px 0 rgba(0,0,0,.12)}
+.pbar i{display:block;height:100%;background:var(--pc);box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);transition:width .5s}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.ptile{position:relative;flex:none;width:150px;min-height:128px;padding:10px;border:0;border-radius:4px;text-align:left;display:flex;flex-direction:column;gap:6px;background:var(--well);color:var(--fg);scroll-snap-align:start;overflow:hidden;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08);-webkit-user-select:none;user-select:none;touch-action:pan-x}
+.ptile .px{font-family:var(--display);font-size:14px;color:var(--muted)}
+.ptile .pn{font-weight:700;font-size:16px;line-height:1.2}
+.ptile .ps{margin-top:auto;font-family:var(--display);font-size:13px}
+.ptile.locked{opacity:.6}
+.ptile.ready{background:var(--yellow);color:var(--ink);box-shadow:inset 0 -5px 0 rgba(0,0,0,.15),0 0 0 3px var(--pc);animation:ready 1.2s ease-in-out infinite}
+.ptile.ready .px{color:var(--ink)}
+@keyframes ready{50%{transform:translateY(-3px)}}
+.ptile.given{background:var(--pc);color:#fff}
+.ptile.given .px{color:rgba(255,255,255,.85)}
+.ptile .hold{position:absolute;left:0;bottom:0;height:6px;width:0;background:var(--green)}
+.ptile.holding .hold{width:100%;transition:width 2s linear}
+
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
 @keyframes jjpulse{50%{transform:scale(1.015)}}
@@ -131,7 +157,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .belt{flex:none;position:relative;width:86px;height:70px;background:#fff;border-radius:6px;box-shadow:inset 0 -8px 0 #C9D1E6;transform:rotate(-6deg)}
 .belt::before{content:"";position:absolute;left:-8px;right:-8px;top:28px;height:14px;background:var(--grape);box-shadow:0 3px 0 #4A2BA8}
 .belt i{position:absolute;left:34px;top:22px;width:18px;height:26px;background:var(--grape);box-shadow:-10px 18px 0 -4px var(--grape),10px 18px 0 -4px var(--grape)}
-.ev.jj{background:var(--grape)}
+.ev.jjc{background:var(--grape)}
 .alarm{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:24px;background:rgba(255,212,0,.94)}
 .acard{width:min(720px,94vw);text-align:center;color:var(--ink)}
 .aclock{font-size:clamp(90px,18vw,170px);line-height:1;animation:shake .35s ease-in-out infinite}
@@ -289,6 +315,12 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     </div>
   </section>
 
+  <section class="prizes block" aria-label="Prize road">
+    <h2>Prize road</h2>
+    <p class="sub">A prize every 150 XP. Parents: press and hold a 🎁 prize for 2 seconds to mark it handed out.</p>
+    <div id="prizeRows"></div>
+  </section>
+
   <section class="counts" id="counts" aria-label="Countdowns"></section>
 
   <section class="lists">
@@ -404,6 +436,9 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   <label for="sTheme">Look</label><select id="sTheme"><option value="auto">Match device</option><option value="light">Daytime</option><option value="dark">Night</option></select>
   <label for="sCap">Most XP from the game per day, each</label><select id="sCap"><option>10</option><option>20</option><option>30</option><option>50</option><option>100</option></select>
   <label for="sGrace">Game touch help (extra time to react on a laggy screen)</label><select id="sGrace"><option value="90">A little</option><option value="160">Normal</option><option value="260">Lots</option></select>
+  <label for="sPrizes">Prizes, one per line (1st line = 150 XP, 2nd = 300 XP, and so on)</label>
+  <textarea id="sPrizes" style="min-height:220px;font-size:17px;font-weight:500"></textarea>
+  <div class="bonus" style="margin-top:10px"><button type="button" id="sPrizeReset">Restore the suggested prizes</button></div>
   <label for="sAlarmOn">School alarm (silly voice, Monday to Friday)</label>
   <div style="display:flex;gap:10px"><select id="sAlarmOn" style="flex:1"><option value="on">On</option><option value="off">Off</option></select><input id="sAlarmT" type="time" style="flex:1"></div>
   <div class="bonus" style="margin-top:10px"><button type="button" id="sTest">Test the alarm now</button></div>
@@ -426,7 +461,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   var RANKS=["Noob builder","Block hopper","Obby runner","Coin collector","Pro builder","Speed legend","Ultimate champion"];
   var PC={tyson:{name:"Tyson",c:"#2F80FF",d:"#1A4FA8"},riyek:{name:"Riyek",c:"#FF8A00",d:"#A85A00"}};
   var defaults={clock:"12",theme:"auto",anim:"off",night:"off",from:"21:30",to:"06:30",cap:"30",
-    grace:"160",events:[],side:[],alarmOn:"on",alarmT:"08:00",lastAlarm:"",jj:"on",jjT:"",players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
+    grace:"160",claimed:{tyson:[],riyek:[]},prizes:null,events:[],side:[],alarmOn:"on",alarmT:"08:00",lastAlarm:"",jj:"on",jjT:"",players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
     notes:[{id:1,text:"Tap a note to take it down",c:0,from:""}],counts:[],grocery:[],todo:[]};
   var S=load();
 
@@ -452,6 +487,58 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   function level(xp){return Math.floor(xp/100)+1;}
   function rankOf(lv){return RANKS[Math.min(lv-1,RANKS.length-1)];}
   $$(".segs").forEach(function(s){for(var i=0;i<10;i++)s.appendChild(el("i"));});
+  var STEP=150;
+  var PRIZE_IDEAS=[
+    "Pick what's for dinner",
+    "30 minutes extra screen time",
+    "Stay up 30 minutes late on a weekend",
+    "Pick the family movie and snacks",
+    "Skip one chore of your choice",
+    "$10 gift card for your favourite game",
+    "Dollar store trip with $10",
+    "Pick a restaurant for dinner",
+    "Friend sleepover",
+    "Breakfast in bed, made by Mom or Dad",
+    "New building or Lego set (about $25)",
+    "Trampoline park or laser tag trip",
+    "No chores for a whole week",
+    "Pick a weekend family adventure",
+    "New video game (about $60)",
+    "Big day out: you plan the whole day"];
+  function prizeList(){return (S.prizes&&S.prizes.length)?S.prizes:PRIZE_IDEAS;}
+  function prizeName(i){var l=prizeList();return l[i]||"Mystery prize (parent's choice)";}
+  function renderPrizes(){
+    var box=$("#prizeRows");if(!box)return;box.textContent="";
+    ["tyson","riyek"].forEach(function(p){
+      var xp=S.players[p].xp,got=Math.floor(xp/STEP),cl=S.claimed[p]||(S.claimed[p]=[]),nextAt=(got+1)*STEP;
+      var row=el("div","prow");row.setAttribute("data-p",p);
+      var hd=el("div","pnext");hd.appendChild(el("b",null,PC[p].name));
+      var ready=[];for(var i=0;i<got;i++)if(cl.indexOf(i)<0)ready.push(i);
+      hd.appendChild(document.createTextNode(ready.length?ready.length+" prize"+(ready.length>1?"s":"")+" to collect! ":"Next: "+prizeName(got)));
+      hd.appendChild(el("span","togo",(nextAt-xp)+" XP to the next prize"));
+      row.appendChild(hd);
+      var bar=el("div","pbar"),fi=el("i");fi.style.width=((xp%STEP)/STEP*100)+"%";bar.appendChild(fi);row.appendChild(bar);
+      var strip=el("div","strip"),total=Math.max(prizeList().length,got+3),firstOpen=0;
+      while(firstOpen<got&&cl.indexOf(firstOpen)>-1)firstOpen++;
+      for(var j=0;j<total;j++){
+        var st=cl.indexOf(j)>-1?"given":(j<got?"ready":"locked");
+        var t=el("button","ptile "+st);
+        t.appendChild(el("span","px",((j+1)*STEP)+" XP"));t.appendChild(el("span","pn",prizeName(j)));
+        t.appendChild(el("span","ps",st==="given"?"✓ Given":st==="ready"?"🎁 Ready!":"🔒 Locked"));
+        if(st==="ready"){t.appendChild(el("span","hold"));holdToGive(t,p,j);}
+        strip.appendChild(t);
+        if(j===firstOpen)t.setAttribute("data-first","1");
+      }
+      row.appendChild(strip);box.appendChild(row);
+      var f=$('[data-first]',strip);if(f)strip.scrollLeft=Math.max(0,f.offsetLeft-strip.offsetLeft-4);
+    });
+  }
+  function holdToGive(t,p,j){var timer=null;
+    function start(e){if(timer)return;t.classList.add("holding");timer=setTimeout(function(){timer=null;
+      S.claimed[p].push(j);save();renderPrizes();burst("Enjoy your prize!",PC[p].name+": "+prizeName(j),PC[p].c);confetti(PC[p].c);},2000);}
+    function stop(){if(timer){clearTimeout(timer);timer=null;}t.classList.remove("holding");}
+    t.addEventListener("pointerdown",start);t.addEventListener("pointerup",stop);t.addEventListener("pointerleave",stop);t.addEventListener("pointercancel",stop);
+    t.addEventListener("contextmenu",function(e){e.preventDefault();});}
   function renderXP(){
     ["tyson","riyek"].forEach(function(p){
       var card=$('.player[data-p="'+p+'"]'),pl=S.players[p],lv=level(pl.xp),into=pl.xp%100;
@@ -461,10 +548,12 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     });
     $("#bestT").textContent="Best "+S.players.tyson.best;$("#bestR").textContent="Best "+S.players.riyek.best;
     if(bg.ready)bg.grow();
+    renderPrizes();
   }
   function addXP(p,n,label){
-    var before=level(S.players[p].xp);S.players[p].xp=Math.max(0,S.players[p].xp+n);save();renderXP();
+    var before=level(S.players[p].xp),pb=Math.floor(S.players[p].xp/STEP);S.players[p].xp=Math.max(0,S.players[p].xp+n);save();renderXP();
     if(n<=0)return;
+    if(Math.floor(S.players[p].xp/STEP)>pb){burst("🎁 Prize unlocked!",PC[p].name+": "+prizeName(Math.floor(S.players[p].xp/STEP)-1),PC[p].c);confetti(PC[p].c);}
     if(level(S.players[p].xp)>before){burst(PC[p].name+" leveled up!",rankOf(level(S.players[p].xp)),PC[p].c);confetti(PC[p].c);}
     else burst("+"+n+" XP",label||PC[p].name,PC[p].c);
   }
@@ -569,7 +658,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       if(i>=35&&d.getMonth()!==calM)break;
       var b=el("button","day"+(d.getMonth()!==calM?" out":"")+(k===tk?" today":""));
       b.appendChild(el("span","n",String(d.getDate())));
-      var ev=evsOn(k),isJJ=S.jj==="on"&&(d.getDay()===2||d.getDay()===4);if(isJJ)b.appendChild(el("span","ev jj","Jiu-jitsu"+(S.jjT?" "+fmtT(S.jjT):"")));ev.slice(0,isJJ?1:2).forEach(function(e){b.appendChild(el("span","ev "+e.who,e.text));});
+      var ev=evsOn(k),isJJ=S.jj==="on"&&(d.getDay()===2||d.getDay()===4);if(isJJ)b.appendChild(el("span","ev jjc","Jiu-jitsu"+(S.jjT?" "+fmtT(S.jjT):"")));ev.slice(0,isJJ?1:2).forEach(function(e){b.appendChild(el("span","ev "+e.who,e.text));});
       if(ev.length>(isJJ?1:2))b.appendChild(el("span","more","+"+(ev.length-(isJJ?1:2))+" more"));
       b.setAttribute("aria-label",d.toDateString()+(ev.length?", "+ev.length+" item"+(ev.length>1?"s":""):""));
       (function(key,dt){b.addEventListener("click",function(){openDayDlg(key,dt);});})(k,d);
@@ -623,6 +712,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   function fireAlarm(){woke=Date.now()+3600000;$("#night").classList.remove("on");$("#alarm").hidden=false;alarmCount=1;ring();
     clearInterval(alarmRep);alarmRep=setInterval(function(){if($("#alarm").hidden||alarmCount>=4){clearInterval(alarmRep);return;}alarmCount++;ring();},40000);}
   $("#alarmOk").addEventListener("click",function(){clearInterval(alarmRep);try{speechSynthesis.cancel();}catch(e){}$("#alarm").hidden=true;confetti("#2BC24A");});
+  $("#sPrizeReset").addEventListener("click",function(){$("#sPrizes").value=PRIZE_IDEAS.join("\n");});
   $("#sTest").addEventListener("click",function(){$("#setDlg").close();unlock();fireAlarm();});
   function mins(t){var a=(t||"0:0").split(":");return (+a[0])*60+(+a[1]);}
   function checkReminders(d){
@@ -634,12 +724,12 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   }
 
   /* Settings */
-  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
+  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sPrizes").value=prizeList().join("\n");$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
     $("#sNightOn").value=S.night;$("#sFrom").value=S.from;$("#sTo").value=S.to;$("#setDlg").showModal();});
-  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;S.alarmOn=$("#sAlarmOn").value;S.alarmT=$("#sAlarmT").value||"08:00";S.jj=$("#sJJ").value;S.jjT=$("#sJJT").value;showSnd();
+  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;S.alarmOn=$("#sAlarmOn").value;S.prizes=$("#sPrizes").value.split("\n").map(function(x){return x.trim();}).filter(Boolean);renderPrizes();S.alarmT=$("#sAlarmT").value||"08:00";S.jj=$("#sJJ").value;S.jjT=$("#sJJT").value;showSnd();
     S.night=$("#sNightOn").value;S.from=$("#sFrom").value||"21:30";S.to=$("#sTo").value||"06:30";save();applyTheme();tick();setBg();renderCal();$("#capTxt").textContent=S.cap;$("#setDlg").close();});
   $$("[data-bonus]").forEach(function(b){b.addEventListener("click",function(){$("#setDlg").close();addXP(b.getAttribute("data-bonus"),25,"Bonus!");});});
-  $("#sReset").addEventListener("click",function(){if(confirm("Reset Tyson's and Riyek's XP and best runs?")){["tyson","riyek"].forEach(function(p){S.players[p]={xp:0,best:0};});save();renderXP();$("#setDlg").close();}});
+  $("#sReset").addEventListener("click",function(){if(confirm("Reset Tyson's and Riyek's XP and best runs?")){["tyson","riyek"].forEach(function(p){S.players[p]={xp:0,best:0};});S.claimed={tyson:[],riyek:[]};save();renderXP();$("#setDlg").close();}});
   $$("[data-close]").forEach(function(b){b.addEventListener("click",function(){b.closest("dialog").close();});});
   $("#fsBtn").addEventListener("click",function(){var d=document.documentElement;try{if(!document.fullscreenElement)(d.requestFullscreen||d.webkitRequestFullscreen).call(d);else(document.exitFullscreen||document.webkitExitFullscreen).call(document);}catch(e){}});
 
