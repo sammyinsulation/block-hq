@@ -81,7 +81,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .count.add{padding:14px 22px;color:var(--blue);font-weight:700}
 
 /* Lists */
-.lists{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(20px,2.5vw,32px)}
+.lists{display:grid;grid-template-columns:1fr;gap:clamp(20px,2.5vw,32px)}
 .panel{padding:20px 20px 14px}
 .panel h2{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:28px;color:var(--green);text-shadow:2px 2px 0 #178A31}
 .panel[data-list="grocery"] h2{color:var(--blue);text-shadow:2px 2px 0 #1A4FA8}
@@ -105,6 +105,36 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .clear{border:0;background:none;color:var(--muted);padding:12px 0 2px;font-size:16px;text-decoration:underline}
 .empty{color:var(--muted);font-size:19px;padding:8px 2px}
 
+/* Calendar */
+.cal h2{margin:0;color:var(--red);text-shadow:2px 2px 0 #A51F1F;text-align:center;flex:1}
+.calhead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.calnav{width:58px;height:52px;background:var(--well);color:var(--fg);font-size:22px;border-radius:4px;box-shadow:0 5px 0 var(--cardEdge)}
+.cal .sub{text-align:center}
+.linkbtn{border:0;background:none;color:var(--blue);font-weight:700;text-decoration:underline;padding:0 4px;font-size:15px}
+.dow,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow span{text-align:center;font-family:var(--display);font-size:13px;color:var(--muted);padding:4px 0}
+.day{position:relative;min-height:92px;border:0;border-radius:4px;background:var(--well);color:var(--fg);padding:6px 6px 4px;text-align:left;display:flex;flex-direction:column;gap:3px;overflow:hidden;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
+.day:active{transform:translateY(3px)}
+.day .n{font-family:var(--display);font-size:18px;line-height:1}
+.day.out{opacity:.35}
+.day.today{background:var(--yellow);color:var(--ink);box-shadow:inset 0 -5px 0 rgba(0,0,0,.15),0 0 0 3px var(--ink)}
+.ev{display:block;font-size:13px;font-weight:700;line-height:1.15;padding:2px 4px;border-radius:3px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev.family{background:var(--green)} .ev.tyson{background:var(--blue)} .ev.riyek{background:var(--orange)}
+.more{font-size:12px;font-weight:700;color:var(--muted)}
+.day.today .more{color:var(--ink)}
+.soon{margin-top:16px;display:grid;gap:8px}
+.soon h3{margin:0;font-family:var(--display);font-weight:400;font-size:18px;color:var(--muted)}
+.soonitem{display:flex;gap:12px;align-items:center;background:var(--well);padding:10px 12px;border-radius:4px;font-weight:700;font-size:18px;border:0;text-align:left;color:var(--fg);width:100%}
+.soonitem b{flex:none;font-family:var(--display);font-weight:400;font-size:14px;min-width:92px;color:var(--muted)}
+.dot{flex:none;width:14px;height:14px;border-radius:3px}
+.dot.family{background:var(--green)}.dot.tyson{background:var(--blue)}.dot.riyek{background:var(--orange)}
+.daylist{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:8px}
+.daylist li{display:flex;align-items:center;gap:10px;background:#EEF2FA;padding:10px 12px;border-radius:4px;font-weight:700;font-size:18px}
+.daylist li span.t{color:#5B6488;font-size:15px;min-width:64px}
+.daylist li .x{margin-left:auto;border:0;background:var(--red);color:#fff;border-radius:4px;padding:6px 12px;font-weight:700}
+.daylist .none{background:none;color:#5B6488;padding:0}
+@media (max-width:700px){.day{min-height:64px}.ev{font-size:11px}}
+
 /* Notes */
 .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:28px 22px}
 .note{position:relative;min-height:150px;padding:20px 18px 18px;color:var(--ink);font-weight:700;font-size:22px;line-height:1.25;border:0;text-align:left;overflow-wrap:anywhere;border-radius:4px;
@@ -124,7 +154,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 @keyframes pop{to{transform:translate(var(--x),var(--y)) rotate(var(--rot));opacity:0}}
 
 /* Game overlay */
-.game{position:fixed;inset:0;z-index:70;background:#6EC6FF}
+.game{position:fixed;inset:0;z-index:70;background:#6EC6FF;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #gcv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;image-rendering:pixelated}
 .hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top,0px);display:flex;justify-content:space-between;align-items:flex-start;padding:18px;pointer-events:none}
 .hud .pill{pointer-events:auto;background:#fff;color:var(--ink);font-family:var(--display);font-size:24px;padding:8px 16px;box-shadow:0 6px 0 #9AA7C7;border-radius:4px}
@@ -228,13 +258,18 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       <form class="addrow"><input placeholder="New quest" aria-label="Add quest" maxlength="60"><button>Add</button></form>
       <button class="clear" type="button">Clear finished</button>
     </div>
-    <div class="panel block" data-list="grocery">
-      <h2>Supply run</h2>
-      <p class="sub">What the kitchen needs</p>
-      <ul></ul>
-      <form class="addrow"><input placeholder="Add an item" aria-label="Add grocery item" maxlength="60"><button>Add</button></form>
-      <button class="clear" type="button">Clear checked</button>
+  </section>
+
+  <section class="panel block cal" aria-label="Calendar">
+    <div class="calhead">
+      <button class="calnav press" id="calPrev" aria-label="Previous month">◀</button>
+      <h2 id="calTitle">Calendar</h2>
+      <button class="calnav press" id="calNext" aria-label="Next month">▶</button>
     </div>
+    <p class="sub">Tap a day to add something. <button class="linkbtn" id="calToday">Jump to today</button></p>
+    <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+    <div class="grid" id="calGrid"></div>
+    <div class="soon" id="calSoon"></div>
   </section>
 
   <section class="board" id="board" aria-label="Notes"></section>
@@ -254,7 +289,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       <h2>Block Dash</h2>
       <p>Who's running?</p>
       <div class="pick"><button data-g="tyson">Tyson<small id="bestT">Best 0</small></button><button data-g="riyek">Riyek<small id="bestR">Best 0</small></button></div>
-      <div class="how">Swipe or tap left and right to switch lanes.<br>Swipe up or tap the middle to jump.<br>Jump over low blocks, dodge the walls, grab the coins.<br>Every 100 points = 1 XP (up to <span id="capTxt">30</span> XP a day each).</div>
+      <div class="how">Tap the left or right side to switch lanes.<br>Tap the middle to jump.<br>Jump over low blocks, dodge the walls, grab the coins.<br>Every 100 points = 1 XP (up to <span id="capTxt">30</span> XP a day each).</div>
       <div class="gbtns"><button class="quit" data-quit>Back to HQ</button></div>
     </div>
   </div>
@@ -293,11 +328,24 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   <div class="row"><button class="danger" id="cDel" hidden>Remove</button><button class="ghost" data-close>Cancel</button><button class="primary" id="cSave">Save countdown</button></div>
 </dialog>
 
+<dialog id="dayDlg">
+  <h3 id="dayTitle">Day</h3>
+  <ul class="daylist" id="dayList"></ul>
+  <label for="evText">Add to this day</label>
+  <input id="evText" maxlength="50" placeholder="Hockey game">
+  <div style="display:flex;gap:10px;margin-top:10px">
+    <input id="evTime" type="time" aria-label="Time (optional)" style="flex:1">
+    <select id="evWho" aria-label="Who" style="flex:1"><option value="family">Everyone</option><option value="tyson">Tyson</option><option value="riyek">Riyek</option></select>
+  </div>
+  <div class="row"><button class="ghost" data-close>Done</button><button class="primary" id="evAdd">Add</button></div>
+</dialog>
+
 <dialog id="setDlg">
   <h3>Settings</h3>
   <label for="sClock">Clock</label><select id="sClock"><option value="12">12-hour</option><option value="24">24-hour</option></select>
   <label for="sTheme">Look</label><select id="sTheme"><option value="auto">Match device</option><option value="light">Daytime</option><option value="dark">Night</option></select>
   <label for="sCap">Most XP from the game per day, each</label><select id="sCap"><option>10</option><option>20</option><option>30</option><option>50</option><option>100</option></select>
+  <label for="sGrace">Game touch help (extra time to react on a laggy screen)</label><select id="sGrace"><option value="90">A little</option><option value="160">Normal</option><option value="260">Lots</option></select>
   <label for="sNightOn">Night clock (dims to a clock only)</label>
   <select id="sNightOn"><option value="off">Off</option><option value="on">On</option></select>
   <label>From / until</label>
@@ -315,7 +363,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   var RANKS=["Noob builder","Block hopper","Obby runner","Coin collector","Pro builder","Speed legend","Ultimate champion"];
   var PC={tyson:{name:"Tyson",c:"#2F80FF",d:"#1A4FA8"},riyek:{name:"Riyek",c:"#FF8A00",d:"#A85A00"}};
   var defaults={clock:"12",theme:"auto",anim:"off",night:"off",from:"21:30",to:"06:30",cap:"30",
-    players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
+    grace:"160",events:[],players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
     notes:[{id:1,text:"Tap a note to take it down",c:0,from:""}],counts:[],grocery:[],todo:[]};
   var S=load();
 
@@ -378,7 +426,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       hl.appendChild(el("span","t","Tyson"));hl.appendChild(document.createTextNode(" & "));hl.appendChild(el("span","r","Riyek"));}
     $("#nTime").textContent=f.t+(f.ap?" "+f.ap:"");$("#nDate").textContent=ds;
     $("#night").classList.toggle("on",inNight(d)&&Date.now()>woke&&$("#game").hidden);
-    if(d.getDate()!==lastDay){lastDay=d.getDate();renderCounts();}
+    if(d.getDate()!==lastDay){lastDay=d.getDate();renderCounts();if(window.__calReady)renderCal();}
   }
   $("#night").addEventListener("click",function(){woke=Date.now()+300000;tick();});
 
@@ -421,16 +469,59 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       b.addEventListener("click",function(){it.done=!it.done;save();renderList(name);if(name==="todo")it.who.forEach(function(w){addXP(w,it.done?10:-10,"Quest complete");});});
       li.appendChild(b);ul.appendChild(li);});
     $(".clear",root).hidden=!S[name].some(function(i){return i.done;});}
-  ["todo","grocery"].forEach(function(name){var root=$('[data-list="'+name+'"]');
+  ["todo"].forEach(function(name){var root=$('[data-list="'+name+'"]');
     $("form",root).addEventListener("submit",function(e){e.preventDefault();var inp=$("input",root),t=inp.value.trim();if(!t)return;var o={id:uid(),text:t,done:false};
       if(name==="todo")o.who=["tyson","riyek"].filter(function(w){return whoSel[w];});S[name].push(o);inp.value="";save();renderList(name);});
     $(".clear",root).addEventListener("click",function(){S[name]=S[name].filter(function(i){return !i.done;});save();renderList(name);});renderList(name);});
 
+  /* Calendar */
+  var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var calY,calM,openDay=null;(function(){var d=new Date();calY=d.getFullYear();calM=d.getMonth();})();
+  function iso(y,m,d){return y+"-"+("0"+(m+1)).slice(-2)+"-"+("0"+d).slice(-2);}
+  function todayIso(){var d=new Date();return iso(d.getFullYear(),d.getMonth(),d.getDate());}
+  function evsOn(k){return S.events.filter(function(e){return e.date===k;}).sort(function(a,b){return (a.time||"99")<(b.time||"99")?-1:1;});}
+  function fmtT(t){if(!t)return"";var a=t.split(":"),h=+a[0];if(S.clock==="24")return t;return (h%12||12)+":"+a[1]+(h<12?"am":"pm");}
+  function renderCal(){
+    $("#calTitle").textContent=MONTHS[calM]+" "+calY;
+    var g=$("#calGrid");g.textContent="";var first=new Date(calY,calM,1),start=first.getDay(),tk=todayIso();
+    for(var i=0;i<42;i++){
+      var d=new Date(calY,calM,1-start+i),k=iso(d.getFullYear(),d.getMonth(),d.getDate());
+      if(i>=35&&d.getMonth()!==calM)break;
+      var b=el("button","day"+(d.getMonth()!==calM?" out":"")+(k===tk?" today":""));
+      b.appendChild(el("span","n",String(d.getDate())));
+      var ev=evsOn(k);ev.slice(0,2).forEach(function(e){b.appendChild(el("span","ev "+e.who,e.text));});
+      if(ev.length>2)b.appendChild(el("span","more","+"+(ev.length-2)+" more"));
+      b.setAttribute("aria-label",d.toDateString()+(ev.length?", "+ev.length+" item"+(ev.length>1?"s":""):""));
+      (function(key,dt){b.addEventListener("click",function(){openDayDlg(key,dt);});})(k,d);
+      g.appendChild(b);
+    }
+    var soon=$("#calSoon");soon.textContent="";
+    var up=S.events.filter(function(e){return e.date>=tk;}).sort(function(a,b){return (a.date+(a.time||"99"))<(b.date+(b.time||"99"))?-1:1;}).slice(0,4);
+    if(up.length){soon.appendChild(el("h3",null,"Coming up"));
+      up.forEach(function(e){var p=e.date.split("-"),dt=new Date(+p[0],+p[1]-1,+p[2]),n=Math.round((dt-new Date(new Date().toDateString()))/86400000);
+        var r=el("button","soonitem");r.appendChild(el("b",null,n===0?"Today":n===1?"Tomorrow":DAYS[dt.getDay()].slice(0,3)+" "+MON[dt.getMonth()]+" "+dt.getDate()));
+        r.appendChild(el("span","dot "+e.who));r.appendChild(document.createTextNode(e.text+(e.time?"  "+fmtT(e.time):"")));
+        r.addEventListener("click",function(){openDayDlg(e.date,dt);});soon.appendChild(r);});}
+  }
+  function openDayDlg(k,d){openDay=k;$("#dayTitle").textContent=DAYS[d.getDay()]+", "+MONTHS[d.getMonth()]+" "+d.getDate();
+    $("#evText").value="";$("#evTime").value="";$("#evWho").value="family";renderDayList();$("#dayDlg").showModal();}
+  function renderDayList(){var ul=$("#dayList");ul.textContent="";var ev=evsOn(openDay);
+    if(!ev.length)ul.appendChild(el("li","none","Nothing yet."));
+    ev.forEach(function(e){var li=el("li");li.appendChild(el("span","dot "+e.who));li.appendChild(el("span","t",fmtT(e.time)||"All day"));
+      li.appendChild(document.createTextNode(e.text));var x=el("button","x","Remove");
+      x.addEventListener("click",function(){S.events=S.events.filter(function(o){return o.id!==e.id;});save();renderDayList();renderCal();});li.appendChild(x);ul.appendChild(li);});}
+  $("#evAdd").addEventListener("click",function(){var t=$("#evText").value.trim();if(!t){$("#evText").focus();return;}
+    S.events.push({id:uid(),date:openDay,text:t,time:$("#evTime").value,who:$("#evWho").value});save();$("#evText").value="";$("#evTime").value="";renderDayList();renderCal();});
+  $("#evText").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("#evAdd").click();}});
+  $("#calPrev").addEventListener("click",function(){calM--;if(calM<0){calM=11;calY--;}renderCal();});
+  $("#calNext").addEventListener("click",function(){calM++;if(calM>11){calM=0;calY++;}renderCal();});
+  $("#calToday").addEventListener("click",function(){var d=new Date();calY=d.getFullYear();calM=d.getMonth();renderCal();});
+
   /* Settings */
-  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;
+  $("#setBtn").addEventListener("click",function(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;
     $("#sNightOn").value=S.night;$("#sFrom").value=S.from;$("#sTo").value=S.to;$("#setDlg").showModal();});
-  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;
-    S.night=$("#sNightOn").value;S.from=$("#sFrom").value||"21:30";S.to=$("#sTo").value||"06:30";save();applyTheme();tick();setBg();$("#capTxt").textContent=S.cap;$("#setDlg").close();});
+  $("#sSave").addEventListener("click",function(){S.clock=$("#sClock").value;S.theme=$("#sTheme").value;S.cap=$("#sCap").value;S.grace=$("#sGrace").value;
+    S.night=$("#sNightOn").value;S.from=$("#sFrom").value||"21:30";S.to=$("#sTo").value||"06:30";save();applyTheme();tick();setBg();renderCal();$("#capTxt").textContent=S.cap;$("#setDlg").close();});
   $$("[data-bonus]").forEach(function(b){b.addEventListener("click",function(){$("#setDlg").close();addXP(b.getAttribute("data-bonus"),25,"Bonus!");});});
   $("#sReset").addEventListener("click",function(){if(confirm("Reset Tyson's and Riyek's XP and best runs?")){["tyson","riyek"].forEach(function(p){S.players[p]={xp:0,best:0};});save();renderXP();$("#setDlg").close();}});
   $$("[data-close]").forEach(function(b){b.addEventListener("click",function(){b.closest("dialog").close();});});
@@ -502,7 +593,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     if(Math.random()<.35)G.decor.push({k:"tower",x:side*(6.5+Math.random()*3),z:z,h:3+Math.random()*4,c:["#FF3B3B","#2F80FF","#FFD400","#8B5CFF"][Math.floor(Math.random()*4)]});
     else G.decor.push({k:"tree",x:side*(6+Math.random()*3),z:z});}
   function startRun(who){
-    G={state:"count",who:who,lane:1,x:0,y:0,vy:0,speed:13,dist:0,coins:0,t:0,camX:0,objs:[],decor:[],nextRow:40,nextDecor:0};
+    G={state:"count",who:who,lane:1,x:0,y:0,vy:0,jumpBuf:0,pend:null,speed:12,dist:0,coins:0,t:0,camX:0,objs:[],decor:[],nextRow:40,nextDecor:0};
     for(var z=0;z<FAR;z+=5)decor(z);G.nextDecor=FAR;
     for(z=40;z<FAR;z+=11)spawnRow(z);G.nextRow=z;
     gSize();$("#hudWho").textContent=PC[who].name;$("#hudScore").textContent="0";$("#hudCoins").textContent="0";
@@ -529,20 +620,25 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     G.decor.forEach(function(d){d.z-=mv;});G.decor=G.decor.filter(function(d){return d.z>-Z0+.5;});
     G.nextDecor-=mv;while(G.nextDecor<FAR){decor(G.nextDecor+Math.random()*2);G.nextDecor+=5;}
     G.nextRow-=mv;if(G.nextRow<FAR){spawnRow(G.nextRow);G.nextRow+=Math.max(7,12-G.dist/400);}
+    if(G.jumpBuf>0){G.jumpBuf-=dt;if(G.y<.05){G.vy=11.5;G.jumpBuf=0;}}
+    if(G.pend){var o0=G.pend.o;
+      if(o0.k==="hurdle"&&G.vy>0)G.pend=null;
+      else if(Math.abs(LANES[o0.lane]-LANES[G.lane])>.1)G.pend=null;
+      if(!G.pend)o0.safe=true;
+      else if(now-G.pend.t>(+S.grace||160)){draw();crash();return;}}
     for(var i=G.objs.length-1;i>=0;i--){var o=G.objs[i],z0=o.z;o.z-=mv;
-      if(z0>PZ-.6&&o.z<PZ+.6&&Math.abs(LANES[o.lane]-G.x)<1.1){
+      if(z0>PZ-.6&&o.z<PZ+.6&&Math.abs(LANES[o.lane]-G.x)<1.05){
         if(o.k==="coin"){G.coins++;G.objs.splice(i,1);$("#hudCoins").textContent=G.coins;continue;}
-        if(o.k==="wall"||(o.k==="hurdle"&&G.y<.85)){draw();crash();return;}}
+        if(!o.safe&&!G.pend&&(o.k==="wall"||(o.k==="hurdle"&&G.y<.75)))G.pend={o:o,t:now};}
       if(o.z<-Z0+.3)G.objs.splice(i,1);}
     $("#hudScore").textContent=score();draw();
   }
-  function move(d){if(G.state==="run")G.lane=Math.max(0,Math.min(2,G.lane+d));}
-  function jump(){if(G.state==="run"&&G.y<.05)G.vy=11.5;}
-  (function(){var sx=0,sy=0;
-    cv.addEventListener("pointerdown",function(e){sx=e.clientX;sy=e.clientY;});
-    cv.addEventListener("pointerup",function(e){var dx=e.clientX-sx,dy=e.clientY-sy,w=window.innerWidth;
-      if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))move(dx>0?1:-1);else if(dy<-40)jump();
-      else{if(e.clientX<w/3)move(-1);else if(e.clientX>w*2/3)move(1);else jump();}});
+  function move(d){if(G.state!=="run")return;G.lane=Math.max(0,Math.min(2,G.lane+d));G.x+=(LANES[G.lane]-G.x)*.5;}
+  function jump(){if(G.state!=="run")return;if(G.y<.05||G.pend){G.vy=11.5;G.y=Math.max(G.y,.01);}else G.jumpBuf=.18;}
+  (function(){
+    function down(x){var w=window.innerWidth;if(x<w/3)move(-1);else if(x>w*2/3)move(1);else jump();}
+    if(window.PointerEvent)cv.addEventListener("pointerdown",function(e){e.preventDefault();down(e.clientX);});
+    else cv.addEventListener("touchstart",function(e){e.preventDefault();for(var i=0;i<e.changedTouches.length;i++)down(e.changedTouches[i].clientX);},{passive:false});
     document.addEventListener("keydown",function(e){if($("#game").hidden)return;
       if(e.key==="ArrowLeft"||e.key==="a")move(-1);else if(e.key==="ArrowRight"||e.key==="d")move(1);else if(e.key==="ArrowUp"||e.key===" "||e.key==="w"){e.preventDefault();jump();}});})();
   function openGame(){$("#game").hidden=false;$("#gStart").hidden=false;$("#gOver").hidden=true;$("#gPause").hidden=true;$("#hud").hidden=true;G.state="menu";$("#capTxt").textContent=S.cap;renderXP();gSize();cx2.fillStyle="#6EC6FF";cx2.fillRect(0,0,W,H);}
@@ -557,7 +653,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   $("#endRun").addEventListener("click",function(){$("#gPause").hidden=true;crash();});
   document.addEventListener("visibilitychange",function(){if(document.hidden&&G.state==="run"){G.state="paused";$("#gPause").hidden=false;}});
 
-  applyTheme();renderCounts();renderNotes();tick();renderXP();$("#capTxt").textContent=S.cap;
+  window.__calReady=1;applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
 })();
 </script>
