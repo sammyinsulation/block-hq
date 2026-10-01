@@ -89,8 +89,20 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .panel ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .item{display:flex;align-items:center;gap:12px;width:100%;background:var(--well);border:0;border-radius:4px;padding:12px 14px;font-size:21px;font-weight:700;text-align:left;min-height:58px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
 .box{flex:none;width:32px;height:32px;background:var(--card);box-shadow:inset 0 0 0 3px var(--green);display:grid;place-items:center;font-family:var(--display);font-size:18px;color:#fff;border-radius:3px}
-.done .item{color:var(--muted);text-decoration:line-through}
+.done .item{background:transparent}
 .done .box{background:var(--green);box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+.qtext{flex:1;min-width:0;overflow-wrap:anywhere}
+.done .qtext{text-decoration:line-through;color:var(--muted)}
+.kchecks{display:flex;gap:8px;flex:none}
+.kc{display:flex;align-items:center;gap:8px;border:0;border-radius:4px;padding:8px 12px 8px 8px;font-family:var(--display);font-size:15px;background:var(--card);color:var(--muted);box-shadow:0 4px 0 var(--cardEdge);min-height:48px}
+.kc:active{transform:translateY(3px)}
+.kc .kbox{width:28px;height:28px;border-radius:3px;display:grid;place-items:center;font-size:16px;color:#fff;box-shadow:inset 0 0 0 3px var(--kcol)}
+.kc.tyson{--kcol:var(--blue)} .kc.riyek{--kcol:var(--orange)}
+.kc.tyson{color:var(--blue)} .kc.riyek{color:var(--orange)}
+.kc.on.tyson{background:var(--blue);color:#fff;box-shadow:0 4px 0 #1A4FA8}
+.kc.on.riyek{background:var(--orange);color:#fff;box-shadow:0 4px 0 #A85A00}
+.kc.on .kbox{background:rgba(255,255,255,.25);box-shadow:none}
+@media (max-width:640px){.item{flex-wrap:wrap}.kchecks{width:100%}.kc{flex:1}}
 .tags{margin-left:auto;display:flex;gap:6px;flex:none}
 .tag{font-family:var(--display);font-size:13px;padding:4px 8px;color:#fff;border-radius:3px}
 .tag.tyson{background:var(--blue)} .tag.riyek{background:var(--orange)}
@@ -249,7 +261,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   <section class="lists">
     <div class="panel block" data-list="todo">
       <h2>Quests</h2>
-      <p class="sub">Finish a quest for +10 XP. Quests for both give both of you XP.</p>
+      <p class="sub">Each of you taps your own name when you finish. +10 XP each.</p>
       <ul></ul>
       <div class="who" role="group" aria-label="Who is this quest for">
         <button type="button" class="chip" data-w="tyson" aria-pressed="true">Tyson</button>
@@ -461,18 +473,26 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   var whoSel={tyson:true,riyek:true};
   $$(".chip").forEach(function(ch){ch.addEventListener("click",function(){var w=ch.getAttribute("data-w");whoSel[w]=!whoSel[w];if(!whoSel.tyson&&!whoSel.riyek)whoSel[w==="tyson"?"riyek":"tyson"]=true;
     $$(".chip").forEach(function(c){c.setAttribute("aria-pressed",String(whoSel[c.getAttribute("data-w")]));});});});
+  function isDone(it){return it.who.every(function(w){return it.doneBy&&it.doneBy[w];});}
   function renderList(name){var root=$('[data-list="'+name+'"]'),ul=$("ul",root);ul.textContent="";
-    if(!S[name].length)ul.appendChild(el("li","empty",name==="todo"?"No quests yet. Add one below!":"Nothing needed right now."));
-    S[name].forEach(function(it){var li=el("li",it.done?"done":""),b=el("button","item");b.appendChild(el("span","box",it.done?"✓":""));b.appendChild(document.createTextNode(it.text));
-      if(name==="todo"){var tg=el("span","tags");it.who.forEach(function(w){tg.appendChild(el("span","tag "+w,PC[w].name));});b.appendChild(tg);}
-      b.setAttribute("aria-pressed",String(!!it.done));
-      b.addEventListener("click",function(){it.done=!it.done;save();renderList(name);if(name==="todo")it.who.forEach(function(w){addXP(w,it.done?10:-10,"Quest complete");});});
-      li.appendChild(b);ul.appendChild(li);});
-    $(".clear",root).hidden=!S[name].some(function(i){return i.done;});}
+    if(!S[name].length)ul.appendChild(el("li","empty","No quests yet. Add one below!"));
+    S[name].forEach(function(it){
+      if(!it.doneBy){it.doneBy={};it.who.forEach(function(w){it.doneBy[w]=!!it.done;});}
+      var all=isDone(it),li=el("li",all?"done":""),row=el("div","item");
+      row.appendChild(el("span","qtext",it.text));
+      var ks=el("span","kchecks");
+      it.who.forEach(function(w){
+        var on=!!it.doneBy[w],b=el("button","kc "+w+(on?" on":""));
+        b.appendChild(el("span","kbox",on?"✓":""));b.appendChild(document.createTextNode(PC[w].name));
+        b.setAttribute("aria-pressed",String(on));b.setAttribute("aria-label",PC[w].name+(on?" done":" not done")+": "+it.text);
+        b.addEventListener("click",function(){it.doneBy[w]=!it.doneBy[w];it.done=isDone(it);save();renderList(name);addXP(w,it.doneBy[w]?10:-10,"Quest complete");});
+        ks.appendChild(b);});
+      row.appendChild(ks);li.appendChild(row);ul.appendChild(li);});
+    $(".clear",root).hidden=!S[name].some(isDone);}
   ["todo"].forEach(function(name){var root=$('[data-list="'+name+'"]');
     $("form",root).addEventListener("submit",function(e){e.preventDefault();var inp=$("input",root),t=inp.value.trim();if(!t)return;var o={id:uid(),text:t,done:false};
-      if(name==="todo")o.who=["tyson","riyek"].filter(function(w){return whoSel[w];});S[name].push(o);inp.value="";save();renderList(name);});
-    $(".clear",root).addEventListener("click",function(){S[name]=S[name].filter(function(i){return !i.done;});save();renderList(name);});renderList(name);});
+      if(name==="todo"){o.who=["tyson","riyek"].filter(function(w){return whoSel[w];});o.doneBy={};}S[name].push(o);inp.value="";save();renderList(name);});
+    $(".clear",root).addEventListener("click",function(){S[name]=S[name].filter(function(i){return !isDone(i);});save();renderList(name);});renderList(name);});
 
   /* Calendar */
   var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
