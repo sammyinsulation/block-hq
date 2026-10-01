@@ -311,6 +311,22 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .segr{display:flex;flex-wrap:wrap;gap:8px}.segb{flex:1;min-width:120px;border:0;border-radius:6px;padding:12px;font-weight:700;font-size:17px;background:#EEF2FA;color:var(--ink)}
 .segb.on{background:var(--blue);color:#fff;box-shadow:0 5px 0 #1A4FA8}
 
+/* Exercise */
+.ex{padding:10px 14px;border-top:6px solid var(--red)}
+.exhd{font-family:var(--display);font-size:16px;color:var(--red);text-shadow:1px 1px 0 #A51F1F;margin-bottom:6px}
+.exhd span{font-family:var(--body);font-weight:700;font-size:12px;color:var(--muted);text-shadow:none;margin-left:6px}
+.excols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.excol>b{display:block;font-family:var(--display);font-weight:400;font-size:15px;margin-bottom:4px}
+.excol.tyson>b{color:var(--blue)} .excol.riyek>b{color:var(--orange)}
+.exbtns{display:flex;flex-wrap:wrap;gap:6px}
+.exb{display:flex;align-items:center;gap:6px;border:0;border-radius:4px;padding:6px 10px 6px 6px;font-weight:700;font-size:14px;background:var(--well);color:var(--fg);box-shadow:inset 0 0 0 2px var(--ec),0 3px 0 var(--ed);min-height:40px}
+.excol.tyson .exb{--ec:var(--blue);--ed:#1A4FA8} .excol.riyek .exb{--ec:var(--orange);--ed:#A85A00}
+.exb .eic{font-size:18px;line-height:1}
+.exb.on{background:var(--ec);color:#fff}
+.exb:active{transform:translateY(3px)}
+.exall{font-family:var(--display);font-size:12px;color:var(--green);margin-top:5px}
+@media (max-width:640px){.excols{grid-template-columns:1fr}}
+
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
 @keyframes jjpulse{50%{transform:scale(1.015)}}
@@ -501,6 +517,14 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
         <button class="dbtn tyson" data-dress="tyson"><span class="dbx"></span>Tyson dressed <em>+10</em></button>
         <button class="dbtn riyek" data-dress="riyek"><span class="dbx"></span>Riyek dressed <em>+10</em></button>
       </div>
+    </div>
+  </section>
+
+  <section class="ex block" aria-label="Exercise">
+    <div class="exhd">💪 Move your body <span>+5 XP each · do them all for a +5 bonus</span></div>
+    <div class="excols">
+      <div class="excol tyson"><b>Tyson</b><div class="exbtns" data-exp="tyson"></div></div>
+      <div class="excol riyek"><b>Riyek</b><div class="exbtns" data-exp="riyek"></div></div>
     </div>
   </section>
 
@@ -933,7 +957,7 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
       hl.appendChild(el("span","t","Tyson"));hl.appendChild(document.createTextNode(" & "));hl.appendChild(el("span","r","Riyek"));}
     $("#nTime").textContent=f.t+(f.ap?" "+f.ap:"");$("#nDate").textContent=ds;
     $("#night").classList.toggle("on",inNight(d)&&Date.now()>woke&&$("#game").hidden);
-    if(d.getDate()!==lastDay){lastDay=d.getDate();if(window.__calReady&&typeof renderDressed==="function")renderDressed();renderCounts();if(window.__calReady)renderCal();}
+    if(d.getDate()!==lastDay){lastDay=d.getDate();if(window.__calReady)renderEx();if(window.__calReady&&typeof renderDressed==="function")renderDressed();renderCounts();if(window.__calReady)renderCal();}
     if(window.__remReady)checkReminders(d);
   }
   $("#night").addEventListener("click",function(){woke=Date.now()+300000;tick();});
@@ -1178,6 +1202,19 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
     document.body.appendChild(b);setTimeout(function(){b.remove();},1000);}
   ["tyson","riyek"].forEach(function(p){var card=$('.player[data-p="'+p+'"]');
     [$(".pname",card),$(".ava",card)].forEach(function(x){x.addEventListener("click",function(e){silly(p,e);});});});
+
+  /* Exercise check-offs (once a day each) */
+  var EXER={tyson:[["💪","Push-ups"],["🔥","Crunches"],["🦵","Squats"]],riyek:[["🤸","Trampoline"],["🚲","Bike"],["🛼","Rollerblade"],["🛴","Scooter"]]};
+  function exDay(){if(!S.exer||S.exer.date!==todayIso())S.exer={date:todayIso(),tyson:{},riyek:{},bonus:{}};return S.exer;}
+  function renderEx(){var d=exDay();["tyson","riyek"].forEach(function(p){var box=$('[data-exp="'+p+'"]');if(!box)return;box.textContent="";
+      EXER[p].forEach(function(x){var on=!!d[p][x[1]],b=el("button","exb"+(on?" on":""));b.appendChild(el("span","eic",on?"✅":x[0]));b.appendChild(document.createTextNode(x[1]));
+        b.setAttribute("aria-pressed",String(on));b.addEventListener("click",function(){exToggle(p,x[1]);});box.appendChild(b);});
+      var n=EXER[p].filter(function(x){return d[p][x[1]];}).length,col=box.parentNode,old=$(".exall",col);if(old)old.remove();
+      if(n===EXER[p].length)col.appendChild(el("div","exall","⭐ All done today!"));});}
+  function exToggle(p,name){var d=exDay(),was=!!d[p][name];d[p][name]=!was;var all=EXER[p].every(function(x){return d[p][x[1]];});
+    save();renderEx();
+    if(!was){addXP(p,5,name+"!");if(all&&!d.bonus[p]){d.bonus[p]=1;save();setTimeout(function(){addXP(p,5,"Workout complete!");confetti(PC[p].c);},700);}}
+    else{addXP(p,-5);if(d.bonus[p]){d.bonus[p]=0;save();addXP(p,-5);}}}
 
   /* Settings */
   $("#setBtn").addEventListener("click",function(){needPw(openSettings);});
@@ -1551,7 +1588,7 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
     var o=el("div","cover",msg);$("#chessBody .cwrap").appendChild(o);}
   $("#chessBtn").addEventListener("click",chessStart);
 
-  window.__calReady=1;loadWx();window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
+  window.__calReady=1;renderEx();loadWx();window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
 })();
 </script>
