@@ -189,6 +189,31 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .givebtn.holding .hold{width:100%;transition:width 2s linear}
 .phint{font-size:14px;color:#5B6488;margin:6px 0 0}
 
+/* Weather */
+.wx{padding:16px 18px;border-top:10px solid var(--blue)}
+.wxtop{display:flex;align-items:center;gap:16px}
+.wxicon{flex:none;width:92px;height:92px;display:grid;place-items:center;font-size:58px;background:var(--well);border-radius:6px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
+.wxmain{min-width:0}
+.wxtemp{font-family:var(--display);font-size:46px;line-height:1;color:var(--blue);text-shadow:3px 3px 0 #1A4FA8}
+.wxtemp small{font-family:var(--body);font-weight:700;font-size:16px;color:var(--muted);text-shadow:none;margin-left:10px}
+.wxsay{font-weight:700;font-size:21px;line-height:1.25;margin-top:6px}
+.wxextra{font-size:15px;font-weight:700;color:var(--muted);margin-top:4px}
+.wear{margin-top:14px}
+.wearhd{font-family:var(--display);font-size:18px;color:var(--green);text-shadow:1px 1px 0 #178A31;margin-bottom:8px}
+.wearlist{display:flex;flex-wrap:wrap;gap:8px}
+.wi{display:flex;align-items:center;gap:8px;background:var(--well);padding:8px 12px;border-radius:4px;font-weight:700;font-size:17px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
+.wi span{font-size:26px;line-height:1}
+.dressed{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.dbtn{display:flex;align-items:center;gap:10px;border:0;border-radius:4px;padding:12px;font-weight:700;font-size:17px;background:var(--card);color:var(--fg);box-shadow:inset 0 0 0 3px var(--dc),0 5px 0 var(--dd);text-align:left}
+.dbtn.tyson{--dc:var(--blue);--dd:#1A4FA8} .dbtn.riyek{--dc:var(--orange);--dd:#A85A00}
+.dbtn em{margin-left:auto;font-style:normal;font-family:var(--display);font-size:13px;color:var(--dc)}
+.dbtn .dbx{flex:none;width:26px;height:26px;border-radius:3px;box-shadow:inset 0 0 0 3px var(--dc);display:grid;place-items:center;font-family:var(--display);color:#fff}
+.dbtn.on{background:var(--dc);color:#fff}
+.dbtn.on em{color:#fff}
+.dbtn.on .dbx{background:rgba(255,255,255,.3);box-shadow:none}
+.dbtn:active{transform:translateY(4px)}
+@media (max-width:640px){.dressed{grid-template-columns:1fr}}
+
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
 @keyframes jjpulse{50%{transform:scale(1.015)}}
@@ -361,6 +386,25 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     <div class="track" id="track"><div class="lane" id="lane"></div></div>
   </section>
 
+  <section class="wx block" id="wx" aria-label="Weather and what to wear">
+    <div class="wxtop">
+      <div class="wxicon" id="wxIcon">⛅</div>
+      <div class="wxmain">
+        <div class="wxtemp"><span id="wxTemp">--°</span><small id="wxFeels"></small></div>
+        <div class="wxsay" id="wxSay">Checking the sky…</div>
+        <div class="wxextra" id="wxExtra"></div>
+      </div>
+    </div>
+    <div class="wear" id="wxWearBox" hidden>
+      <div class="wearhd">👕 Wear today</div>
+      <div class="wearlist" id="wxWear"></div>
+      <div class="dressed">
+        <button class="dbtn tyson" data-dress="tyson"><span class="dbx"></span>Tyson is dressed! <em>+10 XP</em></button>
+        <button class="dbtn riyek" data-dress="riyek"><span class="dbx"></span>Riyek is dressed! <em>+10 XP</em></button>
+      </div>
+    </div>
+  </section>
+
   <section class="counts" id="counts" aria-label="Countdowns"></section>
 
   <section class="lists">
@@ -517,7 +561,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   var RANKS=["Noob builder","Block hopper","Obby runner","Coin collector","Pro builder","Speed legend","Ultimate champion"];
   var PC={tyson:{name:"Tyson",c:"#2F80FF",d:"#1A4FA8"},riyek:{name:"Riyek",c:"#FF8A00",d:"#A85A00"}};
   var defaults={clock:"12",theme:"auto",anim:"off",night:"off",from:"21:30",to:"06:30",cap:"30",
-    grace:"160",claimed:{tyson:[],riyek:[]},prizes:null,events:[],side:[],alarmOn:"on",alarmT:"08:00",lastAlarm:"",jj:"on",jjT:"",players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
+    grace:"160",dressed:{date:"",tyson:false,riyek:false},wxCache:null,claimed:{tyson:[],riyek:[]},prizes:null,events:[],side:[],alarmOn:"on",alarmT:"08:00",lastAlarm:"",jj:"on",jjT:"",players:{tyson:{xp:0,best:0},riyek:{xp:0,best:0}},gameDay:{date:"",tyson:0,riyek:0},
     notes:[{id:1,text:"Tap a note to take it down",c:0,from:""}],counts:[],grocery:[],todo:[]};
   var S=load();
 
@@ -648,7 +692,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       hl.appendChild(el("span","t","Tyson"));hl.appendChild(document.createTextNode(" & "));hl.appendChild(el("span","r","Riyek"));}
     $("#nTime").textContent=f.t+(f.ap?" "+f.ap:"");$("#nDate").textContent=ds;
     $("#night").classList.toggle("on",inNight(d)&&Date.now()>woke&&$("#game").hidden);
-    if(d.getDate()!==lastDay){lastDay=d.getDate();renderCounts();if(window.__calReady)renderCal();}
+    if(d.getDate()!==lastDay){lastDay=d.getDate();if(window.__calReady&&typeof renderDressed==="function")renderDressed();renderCounts();if(window.__calReady)renderCal();}
     if(window.__remReady)checkReminders(d);
   }
   $("#night").addEventListener("click",function(){woke=Date.now()+300000;tick();});
@@ -803,6 +847,63 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     if(jj)$("#jjSub").textContent=(S.jjT?"Class at "+fmtT(S.jjT)+". ":"")+"Pack your gi and water bottle!";
   }
 
+  /* Weather: Open-Meteo, London ON, no key needed */
+  var WX_URL="https://api.open-meteo.com/v1/forecast?latitude=42.98&longitude=-81.25&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=apparent_temperature,precipitation_probability,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=America%2FToronto&forecast_days=1";
+  function wxKind(c){if(c>=95)return"thunder";if((c>=71&&c<=77)||c===85||c===86)return"snow";if((c>=51&&c<=67)||(c>=80&&c<=82))return"rain";if(c===45||c===48)return"fog";if(c===0)return"clear";if(c<=2)return"partly";return"cloudy";}
+  var WX_ICON={thunder:"⛈️",snow:"🌨️",rain:"🌧️",fog:"🌫️",clear:"☀️",partly:"⛅",cloudy:"☁️"};
+  function feelWords(t){
+    if(t<=-15)return"Frostbite zone! Even polar bears would want hot chocolate.";
+    if(t<=-5)return"Freezer cold! It's like walking around inside our freezer.";
+    if(t<=3)return"Really chilly. You'll see your breath puff like a dragon!";
+    if(t<=10)return"Chilly and crisp. Definitely jacket weather.";
+    if(t<=16)return"Cool outside. Cozy sweater weather.";
+    if(t<=22)return"Nice and comfy. Not too hot, not too cold.";
+    if(t<=27)return"Warm out there! Good playing-outside weather.";
+    return"HOT! Lava-floor hot. Drink lots of water!";}
+  function wearFor(t,wet,snow,sun){var w=[];
+    if(t<=-10)w.push(["🧥","Big winter coat"],["👖","Snow pants"],["🧶","Toque"],["🧤","Mittens"],["🧣","Neck warmer"],["🥾","Winter boots"]);
+    else if(t<=0)w.push(["🧥","Winter coat"],["🧶","Toque"],["🧤","Mittens or gloves"],["🥾","Winter boots"]);
+    else if(t<=8)w.push(["🧥","Warm jacket"],["👕","Hoodie or sweater"],["👖","Long pants"],["🧶","Toque"],["🧤","Gloves"]);
+    else if(t<=14)w.push(["🧥","Jacket"],["👕","Long sleeves"],["👖","Long pants"]);
+    else if(t<=20)w.push(["👕","Hoodie or long sleeves"],["👖","Long pants"]);
+    else if(t<=25)w.push(["👕","T-shirt"],["👖","Pants"],["🧥","Bring a light hoodie"]);
+    else w.push(["👕","T-shirt"],["🩳","Shorts"],["🧢","Hat"],["🧴","Sunscreen"]);
+    if(snow&&t>-10)w.push(["👖","Snow pants"]);
+    if(wet)w.push(["🧥","Rain jacket"],["🥾","Rain boots"]);
+    if(sun&&t>20&&t<=25)w.push(["🧴","Sunscreen"]);
+    return w;}
+  function dressedToday(){if(S.dressed.date!==todayIso())S.dressed={date:todayIso(),tyson:false,riyek:false};return S.dressed;}
+  function renderDressed(){var d=dressedToday();$$(".dbtn").forEach(function(b){var p=b.getAttribute("data-dress"),on=!!d[p];b.classList.toggle("on",on);$(".dbx",b).textContent=on?"✓":"";b.setAttribute("aria-pressed",String(on));});}
+  $$(".dbtn").forEach(function(b){b.addEventListener("click",function(){var p=b.getAttribute("data-dress"),d=dressedToday();
+    if(d[p])return;d[p]=true;save();renderDressed();addXP(p,10,"Dressed for the weather!");});});
+  function renderWx(w){
+    if(!w){$("#wxSay").textContent="The weather is hiding right now. Look outside and dress warm!";$("#wxWearBox").hidden=true;return;}
+    var cur=w.current,hrs=w.hourly,day=w.daily;
+    var feelsNow=cur.apparent_temperature,minDay=feelsNow,maxRain=0,wet=false,snow=false,thunder=false;
+    for(var i=0;i<hrs.time.length;i++){var h=+hrs.time[i].slice(11,13);if(h<7||h>18)continue;
+      minDay=Math.min(minDay,hrs.apparent_temperature[i]);maxRain=Math.max(maxRain,hrs.precipitation_probability[i]||0);
+      var k=wxKind(hrs.weather_code[i]);if(k==="rain")wet=true;if(k==="snow")snow=true;if(k==="thunder"){thunder=true;wet=true;}}
+    if(maxRain>=50&&!snow)wet=true;
+    var kind=wxKind(cur.weather_code),t=Math.min(feelsNow,minDay)-3; /* warm side */
+    $("#wxIcon").textContent=WX_ICON[kind];
+    $("#wxTemp").textContent=Math.round(cur.temperature_2m)+"°C";
+    $("#wxFeels").textContent="feels like "+Math.round(feelsNow)+"°";
+    var say=feelWords(Math.min(feelsNow,minDay));
+    if(thunder)say+=" Thunder boomers later, so come inside if you hear thunder!";
+    else if(snow)say+=" Snow is coming ❄️ Snowball alert!";
+    else if(wet)say+=" Rain is coming. Puddle alert!";
+    else if(cur.wind_speed_10m>=30)say+=" Super windy, so hold onto your hat!";
+    $("#wxSay").textContent=say;
+    $("#wxExtra").textContent="Today: high "+Math.round(day.temperature_2m_max[0])+"°, low "+Math.round(day.temperature_2m_min[0])+"°"+(maxRain>=20?" · "+maxRain+"% chance of rain":"");
+    var wl=$("#wxWear");wl.textContent="";var seen={};
+    wearFor(t,wet,snow,kind==="clear"||kind==="partly").forEach(function(x){if(seen[x[1]])return;seen[x[1]]=1;var d=el("div","wi");d.appendChild(el("span",null,x[0]));d.appendChild(document.createTextNode(x[1]));wl.appendChild(d);});
+    $("#wxWearBox").hidden=false;renderDressed();}
+  function loadWx(){
+    if(S.wxCache&&S.wxCache.data&&Date.now()-S.wxCache.t<6*3600000)renderWx(S.wxCache.data);
+    try{fetch(WX_URL).then(function(r){return r.json();}).then(function(j){if(!j||!j.current)throw 0;S.wxCache={t:Date.now(),data:j};save();renderWx(j);})
+      .catch(function(){if(!S.wxCache)renderWx(null);});}catch(e){if(!S.wxCache)renderWx(null);}}
+  setInterval(loadWx,30*60000);
+
   /* Settings */
   $("#setBtn").addEventListener("click",function(){needPw(openSettings);});
   function openSettings(){$("#sClock").value=S.clock;$("#sTheme").value=S.theme;$("#sCap").value=S.cap;$("#sGrace").value=S.grace;$("#sAlarmOn").value=S.alarmOn;$("#sPrizes").value=prizeList().join("\n");$("#sAlarmT").value=S.alarmT;$("#sJJ").value=S.jj;$("#sJJT").value=S.jjT;
@@ -940,7 +1041,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
   $("#endRun").addEventListener("click",function(){$("#gPause").hidden=true;crash();});
   document.addEventListener("visibilitychange",function(){if(document.hidden&&G.state==="run"){G.state="paused";$("#gPause").hidden=false;}});
 
-  window.__calReady=1;window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
+  window.__calReady=1;loadWx();window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
 })();
 </script>
