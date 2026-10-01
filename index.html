@@ -189,30 +189,30 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .givebtn.holding .hold{width:100%;transition:width 2s linear}
 .phint{font-size:14px;color:#5B6488;margin:6px 0 0}
 
-/* Weather */
-.wx{padding:16px 18px;border-top:10px solid var(--blue)}
-.wxtop{display:flex;align-items:center;gap:16px}
-.wxicon{flex:none;width:92px;height:92px;display:grid;place-items:center;font-size:58px;background:var(--well);border-radius:6px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
+/* Weather (compact) */
+.wx{padding:10px 14px;border-top:6px solid var(--blue);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:6px 16px;align-items:start}
+.wxtop{display:flex;align-items:center;gap:10px}
+.wxicon{flex:none;width:52px;height:52px;display:grid;place-items:center;font-size:32px;background:var(--well);border-radius:4px}
 .wxmain{min-width:0}
-.wxtemp{font-family:var(--display);font-size:46px;line-height:1;color:var(--blue);text-shadow:3px 3px 0 #1A4FA8}
-.wxtemp small{font-family:var(--body);font-weight:700;font-size:16px;color:var(--muted);text-shadow:none;margin-left:10px}
-.wxsay{font-weight:700;font-size:21px;line-height:1.25;margin-top:6px}
-.wxextra{font-size:15px;font-weight:700;color:var(--muted);margin-top:4px}
-.wear{margin-top:14px}
-.wearhd{font-family:var(--display);font-size:18px;color:var(--green);text-shadow:1px 1px 0 #178A31;margin-bottom:8px}
-.wearlist{display:flex;flex-wrap:wrap;gap:8px}
-.wi{display:flex;align-items:center;gap:8px;background:var(--well);padding:8px 12px;border-radius:4px;font-weight:700;font-size:17px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
-.wi span{font-size:26px;line-height:1}
-.dressed{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.dbtn{display:flex;align-items:center;gap:10px;border:0;border-radius:4px;padding:12px;font-weight:700;font-size:17px;background:var(--card);color:var(--fg);box-shadow:inset 0 0 0 3px var(--dc),0 5px 0 var(--dd);text-align:left}
+.wxtemp{font-family:var(--display);font-size:26px;line-height:1;color:var(--blue);text-shadow:2px 2px 0 #1A4FA8}
+.wxtemp small{font-family:var(--body);font-weight:700;font-size:13px;color:var(--muted);text-shadow:none;margin-left:6px}
+.wxsay{font-weight:700;font-size:15px;line-height:1.2;margin-top:3px}
+.wxextra{font-size:12px;font-weight:700;color:var(--muted);margin-top:2px}
+.wear{margin-top:0}
+.wearhd{font-family:var(--display);font-size:13px;color:var(--green);margin-bottom:4px}
+.wearlist{display:flex;flex-wrap:wrap;gap:4px}
+.wi{display:flex;align-items:center;gap:4px;background:var(--well);padding:3px 7px;border-radius:3px;font-weight:700;font-size:13px}
+.wi span{font-size:16px;line-height:1}
+.dressed{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.dbtn{display:flex;align-items:center;gap:6px;border:0;border-radius:4px;padding:6px 8px;font-weight:700;font-size:13px;background:var(--card);color:var(--fg);box-shadow:inset 0 0 0 2px var(--dc),0 3px 0 var(--dd);text-align:left;min-height:40px}
 .dbtn.tyson{--dc:var(--blue);--dd:#1A4FA8} .dbtn.riyek{--dc:var(--orange);--dd:#A85A00}
-.dbtn em{margin-left:auto;font-style:normal;font-family:var(--display);font-size:13px;color:var(--dc)}
-.dbtn .dbx{flex:none;width:26px;height:26px;border-radius:3px;box-shadow:inset 0 0 0 3px var(--dc);display:grid;place-items:center;font-family:var(--display);color:#fff}
+.dbtn em{margin-left:auto;font-style:normal;font-family:var(--display);font-size:11px;color:var(--dc)}
+.dbtn .dbx{flex:none;width:20px;height:20px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--dc);display:grid;place-items:center;font-family:var(--display);font-size:12px;color:#fff}
 .dbtn.on{background:var(--dc);color:#fff}
 .dbtn.on em{color:#fff}
 .dbtn.on .dbx{background:rgba(255,255,255,.3);box-shadow:none}
-.dbtn:active{transform:translateY(4px)}
-@media (max-width:640px){.dressed{grid-template-columns:1fr}}
+.dbtn:active{transform:translateY(3px)}
+@media (max-width:700px){.wx{grid-template-columns:1fr}}
 
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
@@ -399,8 +399,8 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       <div class="wearhd">👕 Wear today</div>
       <div class="wearlist" id="wxWear"></div>
       <div class="dressed">
-        <button class="dbtn tyson" data-dress="tyson"><span class="dbx"></span>Tyson is dressed! <em>+10 XP</em></button>
-        <button class="dbtn riyek" data-dress="riyek"><span class="dbx"></span>Riyek is dressed! <em>+10 XP</em></button>
+        <button class="dbtn tyson" data-dress="tyson"><span class="dbx"></span>Tyson dressed <em>+10</em></button>
+        <button class="dbtn riyek" data-dress="riyek"><span class="dbx"></span>Riyek dressed <em>+10</em></button>
       </div>
     </div>
   </section>
