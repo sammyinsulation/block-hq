@@ -222,7 +222,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 @keyframes bub{from{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-20px) scale(1.15);opacity:1}to{transform:translate(-50%,-90px) scale(1);opacity:0}}
 
 /* Games grid */
-.games{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gtile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:0;border-radius:6px;padding:12px 12px 14px;text-align:left;color:#fff;min-height:112px;position:relative;overflow:hidden;
   box-shadow:inset 0 -8px 0 rgba(0,0,0,.18),inset 0 4px 0 rgba(255,255,255,.3),0 7px 0 var(--ge),0 14px 20px rgba(0,0,0,.2)}
 .gtile .gic{font-size:34px;line-height:1;margin-bottom:4px;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.25))}
@@ -230,6 +230,11 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .gtile small{font-weight:700;font-size:13px;opacity:.95}
 .g1{background:var(--red);--ge:#A51F1F} .g2{background:var(--green);--ge:#178A31} .g3{background:var(--grape);--ge:#4A2BA8} .g4{background:#1B1F3B;--ge:#000}
 .g4 .gic{color:#fff}
+.g5{background:#14A3A3;--ge:#0B6E6E} .g6{background:#E8478B;--ge:#9E2459}
+.qzcard{padding-top:16px}.qzemo{font-size:70px;line-height:1.1}.qzq{font-family:var(--display);font-size:clamp(26px,4.5vw,40px);line-height:1.15;margin-top:8px}
+.qzopts{width:min(820px,100%);display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qzo{border:0;border-radius:6px;padding:20px 14px;font-weight:700;font-size:clamp(19px,2.8vw,26px);background:#fff;color:var(--ink);box-shadow:0 7px 0 #9AA7C7;min-height:84px}
+.qzo:active{transform:translateY(4px)}.qzo.right{background:var(--green);color:#fff;box-shadow:0 7px 0 #178A31}.qzo.wrong{background:#FFD2D2;opacity:.6}
 @media (max-width:700px){.games{grid-template-columns:1fr 1fr}}
 
 /* Overlays */
@@ -495,6 +500,8 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
     <button class="gtile press g2" id="mathBtn"><span class="gic">🧮</span><b>Math Mission</b><small>Level up your brain</small></button>
     <button class="gtile press g3" id="puzBtn"><span class="gic">🧩</span><b>Chess Puzzles</b><small>Find the best move</small></button>
     <button class="gtile press g4" id="chessBtn"><span class="gic">♞</span><b>Chess</b><small>vs computer or each other</small></button>
+    <button class="gtile press g5" id="geoBtn"><span class="gic">🌎</span><b>Geography Quest</b><small>Explore the world</small></button>
+    <button class="gtile press g6" id="spaceBtn"><span class="gic">🚀</span><b>Space Quest</b><small>Planets &amp; stars</small></button>
   </section>
 
   <section class="road block" aria-label="Prize road">
@@ -599,6 +606,7 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
 <div class="ov" id="ovPuz" hidden><div class="ovbar"><h2>🧩 Chess Puzzles</h2><button class="ovx" data-ovclose aria-label="Close">✕</button></div><div class="ovbody" id="puzBody"></div></div>
 <div class="ov" id="ovChess" hidden><div class="ovbar"><h2>♞ Chess</h2><button class="ovx" data-ovclose aria-label="Close">✕</button></div><div class="ovbody" id="chessBody"></div></div>
 
+<div class="ov" id="ovQuiz" hidden><div class="ovbar"><h2 id="quizTitle">Quiz</h2><button class="ovx" data-ovclose aria-label="Close">✕</button></div><div class="ovbody" id="quizBody"></div></div>
 <div class="burst" id="burst"></div>
 <div class="alarm" id="alarm" hidden>
   <div class="acard">
@@ -778,9 +786,11 @@ var CH=(function(){
 var MATH=(function(){
   function R(a,b){return a+Math.floor(Math.random()*(b-a+1));}
   function pick(a){return a[Math.floor(Math.random()*a.length)];}
+  function F(n){var neg=n<0,s=String(Math.abs(n)).split("."),i=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");return (neg?"−":"")+i+(s[1]?"."+s[1]:"");}
   var THINGS=["🍎","⭐","🐶","🍪","⚽","🚗","🐸","🧁","🦖","🍓"];
+  var PLACES=[["ones",1],["tens",10],["hundreds",100],["thousands",1000],["ten thousands",10000],["hundred thousands",100000],["millions",1000000]];
   var NAMES={riyek:["Count it","Count to 10","Adding with pictures","Adding to 10","Taking away","Take away from 10","Which is bigger?","Make 10 & add to 20","Take away from 20"],
-             tyson:["Warm-up: add & subtract","Times tables 2, 5, 10","Times tables 2 to 9","Division facts","Big adding & subtracting","Times tables to 12","Multiply bigger numbers","Order of operations","Fractions & decimals","Negatives & percents","Expert: 2-digit × 2-digit"]};
+             tyson:["Warm-up: add & subtract to 1,000","Place value","Adding big numbers","Subtracting big numbers","Rounding","Expanded form & comparing","Add & subtract to 1,000,000","Missing numbers","Times tables to 12","Multiply & divide","Decimals","Expert: millions & mixed"]};
   function maxLevel(k){return NAMES[k].length;}
   function riyek(L){var t=pick(THINGS),a,b,n;
     switch(L){
@@ -793,25 +803,165 @@ var MATH=(function(){
       case 7: a=R(1,20);do{b=R(1,20);}while(b===a); return {q:"Which is bigger?",say:"Which number is bigger, "+a+" or "+b+"?",ans:Math.max(a,b),choices:[a,b]};
       case 8: if(Math.random()<.5){a=R(1,9);return {q:a+" + ? = 10",say:a+" plus what makes 10?",ans:10-a};} a=R(5,12);b=R(2,20-a);return {q:a+" + "+b+" = ?",say:"What is "+a+" plus "+b+"?",ans:a+b};
       default: a=R(10,20);b=R(1,a-1);return {q:a+" − "+b+" = ?",say:"What is "+a+" take away "+b+"?",ans:a-b};}}
+  function placeQ(maxPlace){var digits=maxPlace+1,n;do{n=R(Math.pow(10,digits-1),Math.pow(10,digits)-1);}while(false);
+    var s=String(n),pi=R(0,Math.min(maxPlace,s.length-1)),pl=PLACES[pi],digit=+s[s.length-1-pi];
+    if(digit===0)return placeQ(maxPlace);
+    if(Math.random()<.5)return {q:"Value of the "+digit+" in "+F(n)+"?",ans:digit*pl[1],tip:"The "+digit+" is in the "+pl[0]+" place, so it's worth "+F(digit*pl[1])};
+    return {q:"Which digit is in the "+pl[0]+" place of "+F(n)+"?",ans:digit};}
+  function roundQ(){var n=R(1000,99999),to=pick([10,100,1000]),ans=Math.round(n/to)*to;
+    return {q:"Round "+F(n)+" to the nearest "+F(to),ans:ans,tip:"Look at the digit to the right: 5 or more rounds up"};}
   function tyson(L){var a,b,c;
     switch(L){
-      case 1: if(Math.random()<.5){a=R(10,60);b=R(5,39);return {q:a+" + "+b,ans:a+b};} a=R(30,99);b=R(5,a-5);return {q:a+" − "+b,ans:a-b};
-      case 2: a=pick([2,5,10]);b=R(1,10);return {q:a+" × "+b,ans:a*b};
-      case 3: a=R(2,9);b=R(2,9);return {q:a+" × "+b,ans:a*b};
-      case 4: a=R(2,9);b=R(2,9);return {q:(a*b)+" ÷ "+a,ans:b};
-      case 5: if(Math.random()<.5){a=R(25,99);b=R(25,99);return {q:a+" + "+b,ans:a+b};} a=R(120,500);b=R(15,99);return {q:a+" − "+b,ans:a-b};
-      case 6: a=R(3,12);b=R(3,12);return Math.random()<.5?{q:"? × "+a+" = "+(a*b),ans:b}:{q:a+" × "+b,ans:a*b};
-      case 7: a=R(12,49);b=R(3,9);return {q:a+" × "+b,ans:a*b};
-      case 8: a=R(2,20);b=R(2,9);c=R(2,9);return Math.random()<.5?{q:a+" + "+b+" × "+c,ans:a+b*c,tip:"Multiply first!"}:{q:"("+a+" + "+b+") × "+c,ans:(a+b)*c,tip:"Brackets first!"};
-      case 9: var d=pick([2,3,4,5,10]);a=d*R(2,12);return Math.random()<.6?{q:"1/"+d+" of "+a,ans:a/d}:(function(){var x=R(1,9),y=R(1,9);return {q:"0."+x+" + 0."+y,ans:(x+y)/10};})();
-      case 10: if(Math.random()<.5){a=R(-12,12);b=R(-12,12);return {q:a+" + ("+b+")",ans:a+b};} var p=pick([10,25,50]);a=pick([20,40,60,80,100,120,200]);return {q:p+"% of "+a,ans:a*p/100};
-      default: if(Math.random()<.3){a=R(11,20);return {q:a+"²",ans:a*a,tip:a+"² means "+a+" × "+a};} a=R(12,35);b=R(11,25);return {q:a+" × "+b,ans:a*b};}}
+      case 1: if(Math.random()<.5){a=R(120,550);b=R(100,449);return {q:F(a)+" + "+F(b),ans:a+b};} a=R(400,999);b=R(100,a-50);return {q:F(a)+" − "+F(b),ans:a-b};
+      case 2: return placeQ(4);
+      case 3: if(Math.random()<.6){a=R(1000,9999);b=R(1000,9999);}else{a=R(10000,59999);b=R(1000,9999);}return {q:F(a)+" + "+F(b),ans:a+b};
+      case 4: a=R(10000,99999);b=R(1000,a-1000);if(Math.random()<.4)b=R(1000,9999);return {q:F(a)+" − "+F(b),ans:a-b,tip:"Line up the places and borrow (regroup) when you need to"};
+      case 5: return roundQ();
+      case 6: if(Math.random()<.55){var p=[R(1,9)*10000,R(0,9)*1000,R(1,9)*100,R(0,9)*10,R(1,9)].filter(function(x){return x>0;});
+                 return {q:p.map(F).join(" + "),ans:p.reduce(function(s,x){return s+x;},0)};}
+              a=R(10000,99999);var sw=String(a).split("");var i=R(1,3);var tmp=sw[i];sw[i]=sw[i+1];sw[i+1]=tmp;b=+sw.join("");if(b===a)b=a+R(1,99);
+              return {q:"Which is bigger: "+F(a)+" or "+F(b)+"? Type it",ans:Math.max(a,b),tip:"Compare from the biggest place first"};
+      case 7: a=R(100000,899999);b=R(10000,99999);return Math.random()<.5?{q:F(a)+" + "+F(b),ans:a+b}:{q:F(a)+" − "+F(b),ans:a-b};
+      case 8: c=R(10,90)*1000;a=R(1000,c-500);return Math.random()<.5?{q:F(a)+" + ? = "+F(c),ans:c-a,tip:"Subtract to find the missing part"}:{q:"? − "+F(a)+" = "+F(c-a),ans:c,tip:"Add them back together"};
+      case 9: a=R(2,12);b=R(2,12);return Math.random()<.3?{q:"? × "+a+" = "+(a*b),ans:b}:{q:a+" × "+b,ans:a*b};
+      case 10: if(Math.random()<.5){a=R(102,499);b=R(2,9);return {q:F(a)+" × "+b,ans:a*b};} b=R(2,9);a=b*R(11,40);return {q:a+" ÷ "+b,ans:a/b};
+      case 11: var x=R(10,499)/100,y=R(1,99)/10;if(Math.random()<.5)return {q:x.toFixed(2)+" + "+y.toFixed(1),ans:Math.round((x+y)*100)/100};
+               if(x<y){var t2=x;x=y;y=t2;}return {q:x.toFixed(2)+" − "+y.toFixed(y%1?1:2),ans:Math.round((x-y)*100)/100};
+      default: var r=Math.random();if(r<.35)return placeQ(6);if(r<.6){a=R(1000000,4999999);b=R(100000,999999);return {q:F(a)+" + "+F(b),ans:a+b};}
+               if(r<.8){a=R(12,49);b=R(11,25);return {q:a+" × "+b,ans:a*b};} return roundQ();}}
   function make(kid,L){var q=kid==="riyek"?riyek(L):tyson(L);
     if(kid==="riyek"&&!q.choices){var opts=[q.ans],tries=0;while(opts.length<3&&tries<50){tries++;var o=q.ans+pick([-2,-1,1,2,3]);if(o>=0&&opts.indexOf(o)<0)opts.push(o);}
       opts.sort(function(){return Math.random()-.5;});q.choices=opts;}
     return q;}
-  return {make:make,names:NAMES,maxLevel:maxLevel};
+  return {make:make,names:NAMES,maxLevel:maxLevel,fmt:F};
 })();
+
+
+/* [emoji, question, correct, wrong, wrong, (wrong)] — first answer is right; options get shuffled */
+var QUIZ={
+ geo:{riyek:[
+  ["🇨🇦","What country do we live in?","Canada","Mexico","Japan"],
+  ["🗺️","What province do we live in?","Ontario","Alberta","Quebec"],
+  ["🏙️","What city do we live in?","London","Paris","Toronto"],
+  ["🍁","What leaf is on Canada's flag?","Maple leaf","Oak leaf","Palm leaf"],
+  ["🦫","What animal is on Canada's 5-cent coin?","Beaver","Bear","Moose"],
+  ["🌍","From space, what colour is most of the Earth?","Blue","Pink","Purple"],
+  ["🌊","What is the biggest ocean?","Pacific Ocean","Atlantic Ocean","Arctic Ocean"],
+  ["🐧","Where do lots of penguins live?","Antarctica","Africa","The desert"],
+  ["🦘","Where do kangaroos live?","Australia","Canada","Egypt"],
+  ["🐼","Where do giant pandas come from?","China","Brazil","France"],
+  ["🦁","Which continent do wild lions live on?","Africa","Antarctica","Europe"],
+  ["🏔️","What is a very tall hill, often with snow on top?","Mountain","Valley","Beach"],
+  ["🏝️","What do we call land with water all around it?","Island","Desert","Forest"],
+  ["🏜️","What is a very dry, sandy place called?","Desert","Lake","Jungle"],
+  ["🌅","Which way does the sun come up in the morning?","East","West","Down"],
+  ["7️⃣","How many continents are there?","7","3","20"],
+  ["🏛️","What is the capital city of Canada?","Ottawa","London","Vancouver"],
+  ["❄️","Which is colder: the North Pole or a beach in Florida?","North Pole","Beach in Florida","They're the same"],
+  ["💦","Niagara Falls is a giant…","Waterfall","Volcano","Cave"],
+  ["5️⃣","How many Great Lakes are there?","5","2","10"],
+  ["🧭","What tool shows which way is north?","Compass","Spoon","Ruler"],
+  ["🇨🇦","What colours are on Canada's flag?","Red and white","Blue and yellow","Green and black"],
+  ["🌋","A mountain that can shoot out hot lava is a…","Volcano","Glacier","Island"],
+  ["🗺️","A picture that shows where places are is a…","Map","Clock","Calendar"],
+  ["🌳","A place with lots and lots of trees is a…","Forest","Desert","Ocean"],
+  ["🐻‍❄️","Polar bears live where it is…","Very cold","Very hot","Under the sea"],
+  ["🌎","What is the name of our planet?","Earth","Mars","The Sun"]],
+ tyson:[
+  ["🏛️","What is the capital of Canada?","Ottawa","Toronto","Montreal","Vancouver"],
+  ["🍁","How many provinces and territories does Canada have?","13","10","12","15"],
+  ["🗺️","Which is Canada's biggest province by area?","Quebec","Ontario","British Columbia","Alberta"],
+  ["🏝️","Which is Canada's smallest province?","Prince Edward Island","Nova Scotia","New Brunswick","Manitoba"],
+  ["🏙️","What is the capital of Ontario?","Toronto","Ottawa","London","Hamilton"],
+  ["🌲","What is the capital of British Columbia?","Victoria","Vancouver","Kelowna","Kamloops"],
+  ["🛢️","What is the capital of Alberta?","Edmonton","Calgary","Red Deer","Banff"],
+  ["🌾","What is the capital of Saskatchewan?","Regina","Saskatoon","Moose Jaw","Winnipeg"],
+  ["🦌","What is the capital of Manitoba?","Winnipeg","Brandon","Regina","Churchill"],
+  ["⚜️","What is the capital of Quebec?","Quebec City","Montreal","Gatineau","Laval"],
+  ["⚓","What is the capital of Nova Scotia?","Halifax","Sydney","Truro","Moncton"],
+  ["🐟","What is the capital of Newfoundland and Labrador?","St. John's","Corner Brook","Gander","Halifax"],
+  ["🌉","What is the capital of New Brunswick?","Fredericton","Moncton","Saint John","Charlottetown"],
+  ["🥔","What is the capital of Prince Edward Island?","Charlottetown","Summerside","Fredericton","Halifax"],
+  ["❄️","What is the capital of Nunavut?","Iqaluit","Yellowknife","Whitehorse","Inuvik"],
+  ["🏔️","What is the capital of Yukon?","Whitehorse","Dawson City","Yellowknife","Iqaluit"],
+  ["💎","What is the capital of the Northwest Territories?","Yellowknife","Whitehorse","Hay River","Iqaluit"],
+  ["🌊","Which ocean is on Canada's west coast?","Pacific","Atlantic","Arctic","Indian"],
+  ["🌊","Which ocean is between North America and Europe?","Atlantic","Pacific","Indian","Arctic"],
+  ["🏞️","What is the longest river in Canada?","Mackenzie River","St. Lawrence River","Fraser River","Thames River"],
+  ["⛰️","What is the highest mountain in Canada?","Mount Logan","Mount Robson","Mount Everest","Whistler Mountain"],
+  ["🏔️","What is the highest mountain in the world?","Mount Everest","Mount Logan","Mount Kilimanjaro","Mont Blanc"],
+  ["🌏","Which is the largest continent?","Asia","Africa","North America","Europe"],
+  ["💧","Which is the largest of the Great Lakes?","Lake Superior","Lake Ontario","Lake Erie","Lake Huron"],
+  ["🇺🇸","Which Great Lake is completely inside the United States?","Lake Michigan","Lake Erie","Lake Huron","Lake Superior"],
+  ["🏜️","What is the largest hot desert in the world?","Sahara","Gobi","Mojave","Atacama"],
+  ["🌐","The equator splits the Earth into which two halves?","Northern and Southern Hemispheres","Eastern and Western Hemispheres","Day and night","Land and water"],
+  ["📏","On a map, lines that run from the North Pole to the South Pole are lines of…","Longitude","Latitude","The equator","Contour"],
+  ["🗺️","Which is the largest country in the world by area?","Russia","Canada","China","United States"],
+  ["🥈","Which country is the second largest by area?","Canada","Russia","Brazil","Australia"],
+  ["🏖️","Which country has the longest coastline in the world?","Canada","Australia","Russia","United States"],
+  ["👥","Which country has the most people?","India","China","United States","Brazil"],
+  ["🗼","What is the capital of France?","Paris","Lyon","Rome","Madrid"],
+  ["🗾","What is the capital of Japan?","Tokyo","Osaka","Kyoto","Beijing"],
+  ["🦘","What is the capital of Australia?","Canberra","Sydney","Melbourne","Perth"],
+  ["⚽","What is the capital of Brazil?","Brasília","Rio de Janeiro","São Paulo","Buenos Aires"],
+  ["🏛️","What is the capital of the United States?","Washington, D.C.","New York City","Los Angeles","Chicago"],
+  ["🌮","What is the capital of Mexico?","Mexico City","Cancún","Guadalajara","Monterrey"],
+  ["🔺","In which country are the Great Pyramids of Giza?","Egypt","Mexico","Greece","India"],
+  ["🦫","What is Canada's national animal?","Beaver","Moose","Canada goose","Polar bear"],
+  ["🏔️","The Rocky Mountains run through which two provinces?","Alberta and British Columbia","Ontario and Quebec","Manitoba and Saskatchewan","Nova Scotia and New Brunswick"]]},
+ space:{riyek:[
+  ["☀️","What is the big, bright star in our daytime sky?","The Sun","The Moon","A cloud"],
+  ["🌍","What planet do we live on?","Earth","Mars","Jupiter"],
+  ["🌙","What goes around the Earth and lights up the night sky?","The Moon","The Sun","A rainbow"],
+  ["🔴","Which planet is red?","Mars","Earth","Neptune"],
+  ["🪐","Which planet has big, beautiful rings?","Saturn","Mars","Mercury"],
+  ["🟠","Which is the biggest planet?","Jupiter","Earth","Mercury"],
+  ["8️⃣","How many planets go around our Sun?","8","3","100"],
+  ["⭐","The Sun is a…","Star","Planet","Moon"],
+  ["🔥","Which planet is closest to the Sun?","Mercury","Earth","Saturn"],
+  ["👩‍🚀","What do we call a person who travels to space?","Astronaut","Firefighter","Chef"],
+  ["🚀","What do astronauts ride to get into space?","Rocket","Bicycle","Boat"],
+  ["🧑‍🚀","What do astronauts wear in space?","A space suit","A swimsuit","Pyjamas"],
+  ["🌗","What makes daytime and night-time?","The Earth spinning","The Moon blinking","Clouds"],
+  ["⚽","What shape is the Earth?","A ball","A square","A triangle"],
+  ["🌞","Which is bigger: the Sun or the Earth?","The Sun","The Earth","They're the same"],
+  ["✨","When can we see the stars best?","At night","At lunch time","In the morning"],
+  ["☄️","A shooting star is really a…","Meteor","Bird","Plane"],
+  ["🌕","When the Moon looks like a full circle it's called a…","Full moon","Square moon","Blue cheese"],
+  ["🔭","What do we use to see faraway stars and planets?","Telescope","Microscope","Spoon"],
+  ["🧲","What keeps us from floating off the Earth?","Gravity","Glue","Wind"]],
+ tyson:[
+  ["🔴","Which planet is 4th from the Sun?","Mars","Earth","Jupiter","Venus"],
+  ["🌡️","Which planet is the hottest?","Venus","Mercury","Mars","Jupiter"],
+  ["🟠","Which is the largest planet?","Jupiter","Saturn","Neptune","Earth"],
+  ["⚪","Which is the smallest planet?","Mercury","Mars","Venus","Pluto"],
+  ["🌀","Which planet has the Great Red Spot, a giant storm?","Jupiter","Mars","Saturn","Neptune"],
+  ["↪️","Which planet spins tipped over on its side?","Uranus","Neptune","Venus","Saturn"],
+  ["🔵","Which planet is farthest from the Sun?","Neptune","Uranus","Saturn","Pluto"],
+  ["🥶","Pluto is now called a…","Dwarf planet","Moon","Star","Comet"],
+  ["📅","About how long does Earth take to go around the Sun?","365 days","24 hours","30 days","10 years"],
+  ["🕛","How long does Earth take to spin around once?","About 24 hours","About 1 hour","About 7 days","About 1 year"],
+  ["🍂","What causes the seasons on Earth?","Earth's tilt","Distance to the Moon","Clouds","The Sun turning off"],
+  ["🌙","About how long does the Moon take to go around the Earth?","About a month","About a day","About a year","About an hour"],
+  ["👨‍🚀","Who was the first person to walk on the Moon?","Neil Armstrong","Chris Hadfield","Buzz Lightyear","Yuri Gagarin"],
+  ["🇨🇦","Who was the first Canadian to command the International Space Station?","Chris Hadfield","Neil Armstrong","Roberta Bondar","Marc Garneau"],
+  ["🪨","The asteroid belt is between which two planets?","Mars and Jupiter","Earth and Mars","Jupiter and Saturn","Venus and Earth"],
+  ["☀️","The Sun is mostly made of which gas?","Hydrogen","Oxygen","Carbon dioxide","Helium balloons"],
+  ["💡","About how long does sunlight take to reach Earth?","About 8 minutes","About 1 second","About 1 day","About 1 year"],
+  ["🌌","What is the name of our galaxy?","The Milky Way","Andromeda","The Big Dipper","Orion"],
+  ["🌗","Which planet has a day that is longer than its year?","Venus","Mars","Earth","Jupiter"],
+  ["📏","A light-year measures…","Distance","Time","Weight","Temperature"],
+  ["🪐","Which of these is a gas giant?","Saturn","Mars","Venus","Mercury"],
+  ["🧲","What force keeps the planets going around the Sun?","Gravity","Magnetism","Wind","Electricity"],
+  ["🌪️","Which planet spins the fastest (has the shortest day)?","Jupiter","Earth","Venus","Mercury"],
+  ["🛰️","What does ISS stand for?","International Space Station","Indoor Space Ship","Ice Space Satellite","International Star System"],
+  ["2️⃣","How many moons does Mars have?","2","0","1","10"],
+  ["🌍","Which planet is closest in size to Earth?","Venus","Mars","Mercury","Neptune"],
+  ["🌈","What causes the Northern Lights?","Particles from the Sun hitting our air","Moonlight on snow","Lightning","City lights"],
+  ["☄️","A comet's tail always points…","Away from the Sun","Toward the Sun","Down","Toward Earth"],
+  ["🌑","What do we call it when the Moon blocks the Sun?","Solar eclipse","Lunar eclipse","Full moon","Meteor shower"],
+  ["🪨","Which planets are rocky?","Mercury, Venus, Earth and Mars","Jupiter and Saturn","Uranus and Neptune","All of them"]]}};
+
 
 
 var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8/4Q1n1/k5P1/8/3K4/8/8 w - - 0 1","e6g6",["e6a2","e6c4"]],["8/3k4/8/8/1r3RK1/8/8/8 w - - 0 1","f4b4",["f4e4","f4d4"]],["8/8/4K1k1/8/4b1p1/8/2B3P1/8 w - - 0 1","c2e4",["c2b3","c2a4"]],["8/p7/8/K7/8/8/8/1Rr1k3 w - - 0 1","b1c1",["b1b6","b1b2"]],["8/2k5/8/6n1/3P4/8/8/2B2K2 w - - 0 1","c1g5",["c1b2","c1d2"]],["8/8/6K1/3Q4/7P/k7/6n1/8 w - - 0 1","d5g2",["d5e4","d5f7"]],["8/7K/k6b/3P4/B7/8/8/8 w - - 0 1","h7h6",["a4b3","a4d1"]],["4K1k1/8/8/1P6/8/8/1b6/Q7 w - - 0 1","a1b2",["a1e1","a1a3"]],["1B5k/5K2/8/8/8/6n1/8/8 w - - 0 1","b8g3",["b8c7","b8d6"]],["8/8/8/8/2K5/8/3q2k1/4Q3 w - - 0 1","e1d2",["e1a1","e1g3"]],["3K4/8/8/2b5/B2P2k1/8/8/8 w - - 0 1","d4c5",["a4b5","a4e8"]],["8/8/5B2/3k4/3P3q/8/8/K7 w - - 0 1","f6h4",["f6e5","f6h8"]],["8/3k4/3P4/3p4/8/3K1R2/3b4/8 w - - 0 1","d3d2",["f3f7","f3g3"]],["8/3k4/8/6Q1/8/2p5/P4n2/6K1 w - - 0 1","g1f2",["g5d2","g5g7"]],["1n6/3N1k2/8/8/8/4p3/7K/8 w - - 0 1","d7b8",["d7f6","d7c5"]],["8/1k6/8/7Q/8/5n2/8/1K6 w - - 0 1","h5f3",["h5h8","h5g5"]],["8/8/K3B3/3q4/8/8/8/3k4 w - - 0 1","e6d5",["e6c8","e6f7"]],["1k6/8/8/r4p2/8/R7/2P1K3/8 w - - 0 1","a3a5",["a3a1","a3h3"]],["1n6/8/7k/8/8/1R6/1K6/8 w - - 0 1","b3b8",["b3h3","b3d3"]],["8/4qR2/8/2k5/8/3K3P/8/8 w - - 0 1","f7e7",["f7f6","f7h7"]],["8/7K/8/Pk6/6Q1/8/4r3/8 w - - 0 1","g4e2",["g4h5","g4b4"]],["7B/r7/1K6/3pP3/8/8/8/k7 w - - 0 1","b6a7",["h8f6","h8g7"]],["7k/8/8/2Q5/8/2n3K1/8/8 w - - 0 1","c5c3",["c5d5","c5d4"]],["8/8/6R1/6b1/4p3/8/k4K2/8 w - - 0 1","g6g5",["g6c6","g6f6"]],["3B4/8/4K3/1P6/7b/8/8/3k4 w - - 0 1","d8h4",["d8a5","d8g5"]],["6r1/8/6p1/7k/1K6/1B6/8/8 w - - 0 1","b3g8",["b3d5","b3a2"]],["Q2r4/4p3/1k6/8/8/4K3/8/8 w - - 0 1","a8d8",["a8a7","a8a1"]],["8/8/8/K7/7k/1r6/1PQ5/8 w - - 0 1","c2b3",["c2c5","c2h2"]],["8/8/8/K7/6k1/8/6P1/5r1R w - - 0 1","h1f1",["h1h6","h1g1"]],["5K2/8/2k5/8/5B2/7P/8/2r5 w - - 0 1","f4c1",["f4h2","f4d6"]],["8/8/k7/2P5/8/8/r7/1B4K1 w - - 0 1","b1a2",["b1c2","b1e4"]],["K7/8/8/3P4/2k5/3p3b/8/7R w - - 0 1","h1h3",["h1g1","h1a1"]],["1R3r2/8/2K1k3/8/8/8/8/8 w - - 0 1","b8f8",["b8d8","b8b3"]],["7k/2K5/3Rb3/8/8/3P4/8/8 w - - 0 1","d6e6",["d6d8","d6d4"]],["8/1K2k3/8/8/4B2P/8/8/7n w - - 0 1","e4h1",["e4d3","e4c6"]],["3n4/8/8/8/8/8/2PQ4/1k1K4 w - - 0 1","d2d8",["d2c1","d2f2"]],["8/7p/8/8/8/2N1n2k/4K3/8 w - - 0 1","e2e3",["c3b5","c3d1"]],["8/4n3/1P6/8/7B/4K3/8/6k1 w - - 0 1","h4e7",["h4g3","h4f2"]],["8/5p2/8/8/K7/4r3/1k1B4/8 w - - 0 1","d2e3",["d2b4","d2e1"]]],"t2":[["8/8/8/8/8/5K1k/8/2R5 w - - 0 1","c1h1",["f3e3","c1c4"]],["8/5K1k/8/8/8/8/Q7/8 w - - 0 1","a2h2",["a2b1","a2c2"]],["1Q6/8/8/8/8/6K1/8/7k w - - 0 1","b8b1",["b8a8","b8b7"]],["7k/8/7K/8/5R2/8/8/8 w - - 0 1","f4f8",["h6h5","f4f1"]],["8/8/6Q1/8/5K2/7k/8/8 w - - 0 1","g6g3",["g6d3","g6g4"]],["2k5/8/2K5/8/8/8/4Q3/8 w - - 0 1","e2e8",["e2a6","e2e6"]],["8/8/8/7Q/8/2K5/8/2k5 w - - 0 1","h5h1",["h5h6","h5g5"]],["4QK2/7k/8/8/8/8/8/8 w - - 0 1","e8h5",["e8e7","e8e4"]],["8/8/8/6Q1/8/3K4/8/4k3 w - - 0 1","g5g1",["g5e7","g5g3"]],["k7/8/1K6/8/8/6Q1/8/8 w - - 0 1","g3g8",["g3g2","g3a3"]],["8/8/3R4/8/8/6K1/8/7k w - - 0 1","d6d1",["d6h6","d6d4"]],["k7/5Q2/2K5/8/8/8/8/8 w - - 0 1","f7b7",["f7f8","f7e8"]],["8/8/8/4Q3/8/3K4/8/2k5 w - - 0 1","e5a1",["e5f4","e5c3"]],["6k1/Q7/5K2/8/8/8/8/8 w - - 0 1","a7g7",["a7f7","a7a8"]],["7k/8/6K1/8/5R2/8/8/8 w - - 0 1","f4f8",["f4h4","g6h6"]],["7k/3Q1K2/8/8/8/8/8/8 w - - 0 1","d7h3",["d7d4","d7d8"]],["5K1k/8/8/2R5/8/8/8/8 w - - 0 1","c5h5",["f8f7","c5c4"]],["8/8/8/8/k7/2K5/8/1Q6 w - - 0 1","b1b4",["b1b3","b1b5"]],["8/8/k1K5/8/8/6Q1/8/8 w - - 0 1","g3a3",["g3d3","c6d7"]],["8/8/8/8/R7/5K2/8/5k2 w - - 0 1","a4a1",["f3g3","a4g4"]],["8/8/8/8/1Q6/8/7k/5K2 w - - 0 1","b4h4",["b4f4","b4b2"]],["8/8/4R3/8/8/5K1k/8/8 w - - 0 1","e6h6",["f3e4","f3e3"]],["k7/2K5/6R1/8/8/8/8/8 w - - 0 1","g6a6",["g6g8","c7d8"]],["8/8/4QK1k/8/8/8/8/8 w - - 0 1","e6h3",["f6e7","f6e5"]],["8/1Q6/8/8/8/8/k7/2K5 w - - 0 1","b7b2",["b7f7","b7b3"]],["8/Q7/8/7k/5K2/8/8/8 w - - 0 1","a7h7",["a7f7","a7a5"]],["8/3R4/8/8/8/6K1/8/6k1 w - - 0 1","d7d1",["d7d5","d7d4"]],["8/8/Q7/8/8/8/5K1k/8 w - - 0 1","a6h6",["a6d6","a6a2"]],["8/8/8/8/8/8/Q7/5K1k w - - 0 1","a2g2",["a2d5","a2h2"]],["8/8/8/8/8/8/3Q1K1k/8 w - - 0 1","d2h6",["f2f3","d2d6"]],["1k6/8/Q1K5/8/8/8/8/8 w - - 0 1","a6b7",["a6c8","a6a8"]],["8/8/8/8/5K1k/8/8/2Q5 w - - 0 1","c1h1",["c1e1","c1c2"]],["3k4/8/3K4/6R1/8/8/8/8 w - - 0 1","g5g8",["g5h5","d6c5"]],["7k/5K2/4R3/8/8/8/8/8 w - - 0 1","e6h6",["e6e8","e6f6"]],["8/4Q3/8/8/8/5K1k/8/8 w - - 0 1","e7h7",["e7h4","e7d7"]],["k1K5/8/8/6Q1/8/8/8/8 w - - 0 1","g5a5",["g5d5","g5g2"]],["8/6R1/8/8/8/8/8/5K1k w - - 0 1","g7h7",["g7g1","g7g8"]],["8/4Q3/8/k7/2K5/8/8/8 w - - 0 1","e7a7",["e7b4","e7e5"]],["8/8/8/8/8/4Q3/k1K5/8 w - - 0 1","e3a7",["e3a3","e3e6"]],["7k/8/5RK1/8/8/8/8/8 w - - 0 1","f6f8",["g6f5","f6f7"]]],"t3":[["6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1","g5f7",["g5e6","g5f3"]],["6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1","d1d8",["d1d2","d1a1"]],["r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4","h5f7",["h5e5","d2d3"]],["2R5/5Kpp/4P3/8/8/1p3Q2/5nP1/5k2 w - - 0 1","c8c1",["f3d3","f3d1"]],["4K3/8/7b/k2NP3/2Qp4/1P2p3/1P6/8 w - - 0 1","c4a4",["c4c5","c4c7"]],["2R5/8/1p4Q1/3p1P2/P4p2/2K4k/8/8 w - - 0 1","c8h8",["g6g4","g6h7"]],["8/4p1p1/K7/1P1P1k1P/3R4/8/3Q4/8 w - - 0 1","d2f4",["d2f2","d2d3"]],["8/4p3/1Q2R3/P7/4pp2/1K6/P7/k7 w - - 0 1","b6g1",["b6d4","e6c6"]],["8/1p1p4/B6p/2PKn3/3P4/8/1Q3P2/4k3 w - - 0 1","b2e2",["b2b1","b2c3"]],["8/8/1R6/p3p3/4n2k/7P/4Q2K/8 w - - 0 1","e2g4",["e2e4","e2h5"]],["8/1p6/1r5P/1p6/pQ6/3k4/7R/3K4 w - - 0 1","h2h3",["b4e4","b4d4"]],["8/p7/4p3/6Q1/5K2/3P3k/7P/8 w - - 0 1","g5g3",["g5g4","g5h5"]],["4k3/1Q6/3P1p2/2K1pN1p/4P3/8/P7/8 w - - 0 1","b7e7",["b7d7","b7b8"]],["2Q5/7p/7P/P7/2pp3k/P7/5KR1/8 w - - 0 1","c8g4",["c8h3","c8d8"]],["8/8/7P/3p1p2/3BP3/5p1K/6Q1/1k6 w - - 0 1","g2b2",["g2a2","g2g1"]],["5k2/2Q5/2K5/8/7R/Pp1p4/6P1/8 w - - 0 1","h4h8",["c7d6","h4f4"]],["8/8/8/4P3/p1K4p/3n3p/3R3Q/5k2 w - - 0 1","h2h1",["d2f2","d2d1"]],["8/6p1/3R1Pp1/8/1Q6/2P3k1/6P1/6K1 w - - 0 1","d6d3",["b4f4","b4h4"]],["k7/1pK5/6P1/5R2/2P2p2/8/8/8 w - - 0 1","f5a5",["f5f8","c4c5"]],["3k4/6Q1/2Pp4/8/6p1/8/1B6/4K3 w - - 0 1","g7d7",["g7c7","g7f8"]],["7k/3R4/8/8/3p4/6Pp/1Q6/2K5 w - - 0 1","b2b8",["d7d8","d7h7"]],["4k3/4pp2/8/1nQ5/8/1PP2p1K/8/8 w - - 0 1","c5c8",["c5c6","c5b5"]],["2r2k2/3Q4/7N/1pp3P1/8/4K3/8/8 w - - 0 1","d7f7",["d7f5","d7g7"]],["k7/p2K4/8/8/P2R4/1p6/4P3/2Q5 w - - 0 1","c1c8",["c1h1","c1c6"]],["4k3/8/4P3/1p1K1Q2/bB6/4p3/8/8 w - - 0 1","f5f8",["f5h5","f5f7"]],["7k/1Q6/8/3P4/1p6/1p6/2B5/2K5 w - - 0 1","b7h7",["b7g7","b7a8"]],["8/2p3p1/7P/1K1p4/1B3Qb1/8/8/3k4 w - - 0 1","f4d2",["f4f3","f4g4"]],["3k4/7R/8/KP6/p3p1R1/4p3/8/8 w - - 0 1","g4g8",["h7h8","h7d7"]],["5r2/4p3/8/2Kp4/R4pP1/4kP2/1R6/8 w - - 0 1","a4a3",["b2b3","a4e4"]],["8/8/kpPp4/6R1/2K3P1/8/3QP3/8 w - - 0 1","d2a2",["g5a5","g5g6"]],["8/3p4/KPP1R2p/8/6Q1/8/8/7k w - - 0 1","e6h6",["e6e1","g4h5"]],["6k1/R4ppp/P6Q/5K2/8/P7/8/8 w - - 0 1","a7a8",["h6g7","h6h7"]],["8/7k/p3P3/5pR1/3R4/6K1/8/8 w - - 0 1","d4h4",["g5g7","g5h5"]],["8/1Q4p1/3P2P1/kp3K2/8/2P3p1/1B6/8 w - - 0 1","b7a7",["b7c7","b7a8"]],["8/2pp4/K1n5/7k/8/4P3/1Q4R1/8 w - - 0 1","b2h8",["b2e5","g2g5"]],["8/8/6p1/K7/8/3Q1P1p/k1P2P2/2R5 w - - 0 1","d3b3",["c1a1","d3d5"]],["8/1Q6/5K2/1pB4k/3P2pp/8/8/8 w - - 0 1","b7h7",["b7f7","b7d5"]],["K7/p3r3/4P2P/8/4P3/4pQp1/6R1/7k w - - 0 1","f3f1",["g2h2","g2c2"]],["4k3/3p4/1P6/1p1P2K1/8/B7/5Q2/8 w - - 0 1","f2f8",["f2f7","f2e3"]],["k7/8/1P6/p5pr/2Q5/4P1P1/8/1K6 w - - 0 1","c4c8",["c4g8","b6b7"]],["8/7R/kpP2p2/6P1/4Q3/6b1/4P3/K7 w - - 0 1","e4a4",["e4d3","h7a7"]],["7k/4p3/rp4K1/p7/8/3R4/4P2P/8 w - - 0 1","d3d8",["d3h3","d3a3"]],["3k4/8/1pK2P2/2Q5/1p3p2/8/8/7N w - - 0 1","c5f8",["c5d4","c5e7"]]],"t4":[["1k6/7q/8/r4P2/3Np2P/1p1P4/R7/1K6 w - - 0 1","d4c6",["d4e2","d4f3"]],["8/8/kPN5/3PR2p/7P/K5p1/2q5/8 w - - 0 1","c6b4",["c6a7","c6a5"]],["1r4q1/8/1p4P1/8/4NPk1/1B6/2P5/1K6 w - - 0 1","e4f6",["e4c3","e4c5"]],["8/p1K4p/7B/5P2/PN6/8/8/r3k3 w - - 0 1","b4c2",["b4a6","b4d3"]],["8/3p1R2/1P6/5rN1/8/2r3k1/4K3/8 w - - 0 1","g5e4",["g5f3","g5h3"]],["7K/3r4/N1R5/8/2P1P3/1k3p2/8/1r6 w - - 0 1","a6c5",["c6b6","a6c7"]],["8/8/5r1k/p1RK4/8/1P2N3/3P4/8 w - - 0 1","e3g4",["e3c4","e3g2"]],["8/4R3/3Pp3/P5P1/q3k3/4p3/4N3/1K6 w - - 0 1","e2c3",["e2d4","e7e6"]],["6r1/1pp3R1/P4r2/2k3NK/8/P7/1P6/8 w - - 0 1","g5e4",["b2b4","g5e6"]],["8/1r4p1/4P1p1/8/1RK5/4q1k1/7N/8 w - - 0 1","h2f1",["h2g4","h2f3"]],["R1r3k1/8/2rp2p1/3N4/8/8/4P3/5K2 w - - 0 1","d5e7",["d5e3","d5b6"]],["4k3/8/3prPP1/4p2N/1K6/8/8/7B w - - 0 1","h5g7",["h5f4","h5g3"]],["8/7R/2P5/3kp3/6q1/5P2/8/2K2N2 w - - 0 1","f1e3",["f1d2","f1g3"]],["6K1/p5p1/6p1/P3B3/4P1r1/7P/2N5/3r1k2 w - - 0 1","c2e3",["c2a1","c2d4"]],["8/1pq3N1/5P2/1Pk5/7B/1p5P/3K4/8 w - - 0 1","g7e6",["g7f5","g7e8"]],["4K3/1p6/2k5/8/2N5/1r6/7P/2R3r1 w - - 0 1","c4a5",["c4d6","c4b6"]],["4B3/8/3p4/1p1K4/1NP5/2r5/8/2k5 w - - 0 1","b4a2",["b4a6","b4d3"]],["8/7p/2p5/5q2/8/1P2PR2/1Pk1N3/K7 w - - 0 1","e2d4",["e2g3","e2c1"]],["8/Bp6/6r1/8/4PpN1/3k4/8/K7 w - - 0 1","g4e5",["g4f6","g4h2"]],["8/2K2p2/3p1P2/5p2/1N3kP1/3Br2P/r7/8 w - - 0 1","b4d5",["b4c2","b4c6"]],["4K3/8/6p1/2R5/6r1/7P/6N1/5k2 w - - 0 1","g2e3",["c5f5","g2h4"]],["8/8/4k3/3N4/2P5/p3K3/6r1/6B1 w - - 0 1","d5f4",["d5c7","d5c3"]],["8/2p5/6p1/2B5/4P1q1/1Kp2P1N/1P6/4r2k w - - 0 1","h3f2",["h3f4","h3g5"]],["8/k3q3/2PN2Pp/5pr1/8/1K5p/8/6R1 w - - 0 1","d6c8",["g1a1","d6b5"]],["8/8/6N1/5r1p/3K2P1/6P1/4B1k1/1r6 w - - 0 1","g6h4",["e2f1","g6e5"]],["1R4N1/3q4/8/7k/7p/2K5/4P3/8 w - - 0 1","g8f6",["g8h6","b8b5"]],["4k3/3N3R/8/7r/2K4P/6p1/6P1/8 w - - 0 1","d7f6",["h7e7","d7e5"]],["8/8/k1N4p/4K3/2P5/1B3p2/2r5/8 w - - 0 1","c6b4",["c6d4","c6e7"]],["6k1/2R5/3P3r/3r1N2/8/p7/8/1K6 w - - 0 1","f5e7",["c7c8","f5e3"]],["K4R2/8/8/6N1/1p5q/4P3/1P5k/8 w - - 0 1","g5f3",["g5e4","g5h3"]]]};
@@ -1371,6 +1521,7 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
   /* ================= BRAIN GAMES: Math Mission + Chess ================= */
   if(!S.brain)S.brain={};
   ["tyson","riyek"].forEach(function(p){if(!S.brain[p])S.brain[p]={math:1,pz:p==="riyek"?1:2,pzStreak:0,pzMiss:0,wins:0};});
+  ["tyson","riyek"].forEach(function(p){if(S.brain[p].math>MATH.maxLevel(p))S.brain[p].math=MATH.maxLevel(p);});
   if(!S.brainDay)S.brainDay={date:"",tyson:0,riyek:0};
   if(!S.brainCap)S.brainCap="150";
   function brainXP(p,n,label){if(S.brainDay.date!==todayIso())S.brainDay={date:todayIso(),tyson:0,riyek:0};
@@ -1414,8 +1565,8 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
   function mathKey(k){var g=MG;if(!g||g.lock)return;
     if(k==="⌫")g.typed=g.typed.slice(0,-1);else if(k==="✓"){if(g.typed===""||g.typed==="-")return;mathAnswer(parseFloat(g.typed));return;}
     else if(k==="−"){g.typed=g.typed.charAt(0)==="-"?g.typed.slice(1):"-"+g.typed;}else if(k==="."){if(g.typed.indexOf(".")<0)g.typed+=(g.typed===""||g.typed==="-"?"0":"")+".";}
-    else if(g.typed.length<7)g.typed+=k;
-    g.disp.textContent=g.typed.replace("-","−");}
+    else if(g.typed.replace(/[^0-9]/g,"").length<9)g.typed+=k;
+    var tp=g.typed.split("."),ip=tp[0].replace("-","").replace(/\B(?=(\d{3})+(?!\d))/g,",");g.disp.textContent=(g.typed.charAt(0)==="-"?"−":"")+ip+(tp.length>1?"."+tp[1]:"");}
   function mathAnswer(v,btn){var g=MG,q=g.q;if(g.lock)return;g.res=g.res||[];
     var right=Math.abs(v-q.ans)<1e-9;
     if(right){g.lock=true;var pts=g.tries===0?2:1;g.right+=g.tries===0?1:0;g.xp+=pts;g.res[g.i]=g.tries===0;
@@ -1427,7 +1578,7 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
     if(g.p==="riyek"&&g.tries<2&&btn){ /* confidence: let him try again */
       btn.disabled=true;btn.classList.add("wrong");g.fb.className="mfb try";g.fb.textContent="Almost! Try again 😊";say("Almost! Try again.");return;}
     g.lock=true;g.res[g.i]=false;
-    g.fb.className="mfb bad";g.fb.textContent="Nice try! The answer is "+String(q.ans)+(q.tip?". "+q.tip:"");
+    g.fb.className="mfb bad";g.fb.textContent="Nice try! The answer is "+MATH.fmt(q.ans)+(q.tip?". "+q.tip:"");
     if(g.p==="riyek")say("Nice try! It's "+q.ans);
     if(btn)btn.classList.add("wrong");else g.disp.classList.add("wrong");
     setTimeout(function(){g.lock=false;g.i++;mathNext();},g.p==="riyek"?2200:2000);}
@@ -1602,6 +1753,45 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
       else{var wp=winner==="w"?wn:bn,lp=winner==="w"?bn:wn;brainXP(wp,15,"Chess win!");brainXP(lp,5,"Good game!");confetti(PC[wp].c);}}
     var o=el("div","cover",msg);$("#chessBody .cwrap").appendChild(o);}
   $("#chessBtn").addEventListener("click",chessStart);
+
+  /* ---------- Geography & Space quizzes ---------- */
+  var QZ=null,QINF={geo:{title:"🌎 Geography Quest",label:"Geography",col:"#2BC24A"},space:{title:"🚀 Space Quest",label:"Space quiz",col:"#1B1F3B"}};
+  function quizStart(kind){$("#quizTitle").textContent=QINF[kind].title;openOv("ovQuiz");
+    var f=function(p){quizRound(kind,p);};f.info=function(p){return QUIZ[kind][p].length+" questions to discover";};
+    pickPlayer($("#quizBody"),"Who's playing?","10 questions. Get them right for XP!",f);}
+  function quizRound(kind,p){var bank=QUIZ[kind][p];S.quizSeen=S.quizSeen||{};var key=kind+p,seen=S.quizSeen[key]||[];
+    var idx=bank.map(function(x,i){return i;}).filter(function(i){return seen.indexOf(i)<0;});
+    if(idx.length<10){seen=[];idx=bank.map(function(x,i){return i;});}
+    idx.sort(function(){return Math.random()-.5;});idx=idx.slice(0,10);S.quizSeen[key]=seen.concat(idx);save();
+    QZ={kind:kind,p:p,list:idx.map(function(i){return bank[i];}),i:0,right:0,xp:0,res:[]};quizNext();}
+  function quizNext(){var g=QZ,body=$("#quizBody");body.textContent="";if(g.i>=g.list.length)return quizEnd();
+    var q=g.list[g.i];g.tries=0;g.lock=false;
+    var top=el("div","mtop"),dots=el("div","mdots");for(var k=0;k<10;k++)dots.appendChild(el("i",k<g.i?(g.res[k]?"ok":"no"):k===g.i?"now":""));
+    top.appendChild(el("span","mwho "+g.p,PC[g.p].name+" · "+QINF[g.kind].label));top.appendChild(dots);body.appendChild(top);
+    var card=el("div","mcard qzcard");card.appendChild(el("div","qzemo",q[0]));card.appendChild(el("div","qzq",q[1]));
+    if(g.p==="riyek"){var sp=el("button","msay","🔊");sp.addEventListener("click",function(){say(q[1]);});card.appendChild(sp);setTimeout(function(){if(QZ===g)say(q[1]);},250);}
+    body.appendChild(card);var fb=el("div","mfb","");body.appendChild(fb);g.fb=fb;
+    var opts=q.slice(2).sort(function(){return Math.random()-.5;}),ch=el("div","qzopts");
+    opts.forEach(function(o){var b=el("button","qzo",o);b.addEventListener("click",function(){quizAnswer(o,b);});ch.appendChild(b);});body.appendChild(ch);}
+  function quizAnswer(o,btn){var g=QZ,q=g.list[g.i];if(g.lock||btn.disabled)return;
+    if(o===q[2]){g.lock=true;var pts=g.tries===0?2:1;if(g.tries===0)g.right++;g.xp+=pts;g.res[g.i]=g.tries===0;btn.classList.add("right");
+      g.fb.className="mfb good";g.fb.textContent=cheer()+"  +"+pts+" XP";if(AC){try{tone("sine",660,990,0,.12,.2);tone("sine",990,1320,.12,.15,.2);}catch(e){}}
+      setTimeout(function(){g.i++;quizNext();},1100);return;}
+    g.tries++;btn.disabled=true;btn.classList.add("wrong");if(AC){try{tone("square",220,150,0,.2,.1);}catch(e){}}
+    if(g.p==="riyek"&&g.tries<2){g.fb.className="mfb try";g.fb.textContent="Almost! Try again 😊";say("Almost! Try again.");return;}
+    g.lock=true;g.res[g.i]=false;g.fb.className="mfb bad";g.fb.textContent="Good try! It's: "+q[2];
+    $$(".qzo").forEach(function(b){if(b.textContent===q[2])b.classList.add("right");});if(g.p==="riyek")say("Good try! It's "+q[2]);
+    setTimeout(function(){g.i++;quizNext();},2300);}
+  function quizEnd(){var g=QZ,body=$("#quizBody"),bonus=g.right===10?8:g.right>=8?4:0;body.textContent="";
+    var c=el("div","mend");c.appendChild(el("div","mstar",g.right>=9?"🏆":g.right>=7?"⭐":"💪"));c.appendChild(el("h3",null,g.right+" out of 10!"));
+    c.appendChild(el("p","mlvl",g.right>=8?"You're a "+(g.kind==="geo"?"world explorer":"space expert")+"!":"Every round you learn more!"));
+    var got=brainXP(g.p,g.xp+bonus,QINF[g.kind].label);c.appendChild(el("div","earn",got>0?"+"+got+" XP":"Brain XP maxed today"));
+    var bt=el("div","gbtns"),a=el("button","go","Play again");a.addEventListener("click",function(){quizRound(g.kind,g.p);});
+    var s2=el("button","quit","Switch player");s2.addEventListener("click",function(){quizStart(g.kind);});var d=el("button","quit","Done");d.addEventListener("click",function(){closeOv("ovQuiz");});
+    bt.appendChild(a);bt.appendChild(s2);bt.appendChild(d);c.appendChild(bt);body.appendChild(c);if(g.right>=9)confetti(PC[g.p].c);
+    if(g.p==="riyek")say("Great job Riyek! You got "+g.right+"!");}
+  $("#geoBtn").addEventListener("click",function(){quizStart("geo");});
+  $("#spaceBtn").addEventListener("click",function(){quizStart("space");});
 
   window.__calReady=1;renderEx();loadWx();window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
