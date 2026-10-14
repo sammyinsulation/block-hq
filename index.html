@@ -332,6 +332,41 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;z-inde
 .exall{font-family:var(--display);font-size:12px;color:var(--green);margin-top:5px}
 @media (max-width:640px){.excols{grid-template-columns:1fr}}
 
+/* Mom tab */
+.mtabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mtab{border:0;border-radius:6px;padding:14px;font-family:var(--display);font-size:clamp(18px,2.6vw,24px);background:rgba(255,255,255,.55);color:var(--ink);box-shadow:0 5px 0 rgba(27,31,59,.25)}
+.mtab.on{background:#fff;box-shadow:0 6px 0 #9AA7C7,inset 0 -6px 0 var(--tc,#2F80FF)}
+.mtab[data-board="mom"]{--tc:#C2577A}
+body.mommode .wrap>*:not(.top):not(.mtabs):not(.mom){display:none!important}
+.mom{display:none;gap:clamp(18px,2.5vw,26px)}
+body.mommode .mom{display:grid}
+.mhero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border-top:8px solid #C2577A}
+.mhi{font-family:var(--display);font-size:clamp(24px,3.6vw,34px);color:#C2577A;text-shadow:2px 2px 0 #7E2F4B}
+.mzone{font-weight:700;font-size:18px;color:var(--muted);margin-top:6px}
+.mring{position:relative;flex:none;width:96px;height:96px}
+.mring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mring circle{fill:none;stroke-width:5}.mring .rbg{stroke:var(--well)}.mring .rfg{stroke:#C2577A;stroke-linecap:round;stroke-dasharray:106.8;stroke-dashoffset:106.8;transition:stroke-dashoffset .5s}
+.mring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:400;font-size:20px}
+.mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mcard2{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.mk2{font-family:var(--display);font-size:14px;color:#C2577A}
+.mcard2 b,.mdin{font-weight:700;font-size:18px;line-height:1.2;color:var(--fg)}
+.mdin{border:0;background:none;padding:0;text-align:left;text-decoration:underline dotted}
+.mcard2 small{color:var(--muted);font-size:13px}
+.mblk{padding:14px 16px}
+.mblk h3{margin:0 0 4px;display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-weight:400;font-size:22px;color:var(--ink)}
+.mblk h3 small{font-family:var(--body);font-weight:700;font-size:14px;color:var(--muted)}
+.mblk.now{box-shadow:inset 0 0 0 4px #C2577A,0 8px 0 var(--cardEdge),0 18px 24px rgba(0,0,0,.25)}
+.mblk ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.mt{display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:4px;padding:10px 12px;background:var(--well);color:var(--fg);font-size:18px;font-weight:700;text-align:left;min-height:52px}
+.mt .mb{flex:none;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 3px #C2577A;display:grid;place-items:center;color:#fff;font-size:15px}
+.mt .tm{flex:none;min-width:64px;font-size:14px;color:var(--muted)}
+.mt.on{color:var(--muted);text-decoration:line-through}.mt.on .mb{background:#C2577A;box-shadow:none}
+.mt .x{margin-left:auto;border:0;background:none;color:var(--muted);font-size:20px;padding:0 4px}
+.mnote{text-align:center;color:#fff;font-weight:700;text-shadow:1px 1px 0 var(--ink);margin:0}
+#momAdd button{background:#C2577A;box-shadow:0 6px 0 #7E2F4B}
+@media (max-width:700px){.mcards{grid-template-columns:1fr}}
+
 /* Reminders */
 .jj{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:6px;background:#1B1F3B;color:#fff;box-shadow:inset 0 -8px 0 rgba(0,0,0,.3),0 8px 0 #0A0C1F,0 18px 24px rgba(0,0,0,.25);animation:jjpulse 2.4s ease-in-out infinite}
 @keyframes jjpulse{50%{transform:scale(1.015)}}
@@ -473,6 +508,33 @@ dialog textarea{min-height:110px;resize:vertical;font-weight:700}
       <button class="iconbtn block press" id="setBtn" aria-label="Settings">⚙</button>
     </div>
   </header>
+
+  <nav class="mtabs" aria-label="Board">
+    <button class="mtab on" data-board="kids">🧱 Kids HQ</button>
+    <button class="mtab" data-board="mom">🏡 Mom's Day</button>
+  </nav>
+
+  <section class="mom" id="momTab" aria-label="Mom's day">
+    <div class="mhero block">
+      <div>
+        <div class="mhi" id="momHi">Good morning, Mom</div>
+        <div class="mzone" id="momZone"></div>
+      </div>
+      <div class="mring" id="momRing"><svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="17" class="rbg"/><circle cx="21" cy="21" r="17" class="rfg" id="momArc"/></svg><b id="momPct">0%</b></div>
+    </div>
+    <div class="mcards">
+      <div class="mcard2 block"><span class="mk2">🍽️ Tonight's dinner</span><button class="mdin" id="momDinner"></button><small>Tap to change</small></div>
+      <div class="mcard2 block"><span class="mk2">🧺 Laundry today</span><b id="momLaundry"></b><small>One load a day keeps the pile away</small></div>
+      <div class="mcard2 block"><span class="mk2">✨ This week's extra</span><b id="momExtra"></b><small>A small deep-clean each week</small></div>
+    </div>
+    <div id="momBlocks"></div>
+    <div class="mblk block">
+      <h3>➕ Just for today</h3>
+      <ul id="momOwn"></ul>
+      <form class="addrow" id="momAdd"><input placeholder="Add a one-off task" maxlength="60" aria-label="Add a task for today"><button>Add</button></form>
+    </div>
+    <p class="mnote">Everything resets each morning. </p>
+  </section>
 
   <div class="jj" id="jjBanner" hidden>
     <div class="belt" aria-hidden="true"><i></i></div>
@@ -1932,6 +1994,54 @@ var PUZ={"t1":[["8/5k2/r6R/8/p7/2K5/8/8 w - - 0 1","h6a6",["h6e6","h6g6"]],["8/8
     if(g.p==="riyek")say("Great job Riyek! You got "+g.right+"!");}
   $("#geoBtn").addEventListener("click",function(){quizStart("geo");});
   $("#spaceBtn").addEventListener("click",function(){quizStart("space");});
+
+
+  /* ---------- Mom's Day ---------- */
+  var ZONE=[
+    {n:"Sunday · Reset & prep",t:["Meal prep for the week (wash/chop veg, cook a protein)","Fold & put away any leftover laundry","Plan the week: check the calendar, write the grocery list"]},
+    {n:"Monday · Bathrooms",t:["Clean all 3 toilets","Wipe sinks, counters & mirrors in all 3 bathrooms","Scrub tubs & showers","Swap in fresh towels (towel load today)","Empty bathroom garbages"]},
+    {n:"Tuesday · Kitchen deep clean",t:["Clean out the fridge (toss old food)","Wipe microwave, stovetop & cabinet fronts","Mop the kitchen floor","Wipe small appliances & the sink/drain"]},
+    {n:"Wednesday · Bedrooms",t:["Change sheets on all 4 beds (sheet load today)","Dust bedroom surfaces","Vacuum bedrooms","Quick closet & clutter tidy"]},
+    {n:"Thursday · Floors",t:["Vacuum the whole house, stairs included","Mop hard floors","Shake out entry mats"]},
+    {n:"Friday · Living spaces & groceries",t:["Dust & tidy the living / family room","Wipe light switches & door handles","Tidy the front entry (shoes & jackets)","Grocery shop or order pickup"]},
+    {n:"Saturday · Garage & outside",t:["Sweep the double garage & tidy shelves","Tidy the cars (garbage, wipe-down)","Bins & recycling sorted","20-minute family clean-up"]}];
+  var EXTRA=["Wipe inside of oven & fridge shelves","Baseboards & door frames","Windows, blinds & sliding-door tracks","Garage purge: donation box & recycling run","Wash shower curtains, bath mats & pillows"];
+  var DINNER=["Sunday roast (make extra for leftovers)","Pasta night","Taco night","Slow cooker / soup & sandwiches","Stir-fry with rice","Pizza night (homemade or takeout)","Grill / BBQ night"];
+  function momDaily(dow){return [
+    {k:"am",n:"🌅 Morning",t:[["","Unload dishwasher & start coffee"],["","Breakfast"],["","Start today's laundry load"],["","Make beds & open blinds"]]},
+    {k:"mid",n:"☀️ Mid-morning",t:[["","Kitchen reset: wipe counters, empty sink"],["","Laundry to the dryer"],["","10-minute pick-up of the main floor"]]},
+    {k:"pm",n:"🏠 Afternoon",t:[["","Fold & put away today's laundry"],["","Check the calendar & start dinner prep"]]},
+    {k:"eve",n:"🌙 Evening",t:[["","Dinner made & served 🍽️"],["","Kitchen closed: dishwasher on, counters wiped"],["","10-minute family tidy (everyone helps)"]]}];}
+  function momDay(){if(!S.mom||S.mom.date!==todayIso())S.mom={date:todayIso(),done:{},own:[],din:(S.mom&&S.mom.din)||{}};return S.mom;}
+  function laundryFor(dow){return ["Catch-up & fold any leftovers","Towels (with the bathroom clean)","Everyday colours","Sheets (all 4 beds)","Darks & jeans","Everyday colours","Whites & socks"][dow];}
+  function renderMom(){var d=new Date(),dow=d.getDay(),md=momDay(),z=ZONE[dow],wkIdx=Math.floor((d.getDate()-1)/7);
+    var h=d.getHours();$("#momHi").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", Mom 💕";
+    $("#momZone").textContent="Today's zone: "+z.n;
+    $("#momDinner").textContent=md.din[dow]||(S.momDin&&S.momDin[dow])||DINNER[dow];
+    $("#momLaundry").textContent=laundryFor(dow);$("#momExtra").textContent=EXTRA[wkIdx%EXTRA.length];
+    var box=$("#momBlocks");box.textContent="";var total=0,done=0,nowK=h<9?"am":h<12?"mid":h<17?"pm":"eve";
+    var blocks=momDaily(dow);blocks.splice(2,0,{k:"zone",n:"✨ "+z.n,t:z.t.map(function(x){return ["",x];})});
+    blocks.push({k:"extra",n:"🧽 Weekly extra (any day this week)",t:[["",EXTRA[wkIdx%EXTRA.length]]]});
+    blocks.forEach(function(b){var wrap=el("div","mblk block"+(b.k===nowK?" now":"")),hd=el("h3",null,b.n),ul=el("ul"),cnt=0;
+      b.t.forEach(function(t,i){var id=b.k==="extra"?"extra-w"+wkIdx:b.k+i,on=b.k==="extra"?!!(S.momWeek&&S.momWeek[id]):!!md.done[id];total++;if(on){done++;cnt++;}
+        var bt=el("button","mt"+(on?" on":""));bt.appendChild(el("span","mb",on?"✓":""));if(t[0])bt.appendChild(el("span","tm",t[0]));bt.appendChild(document.createTextNode(t[1]));
+        bt.addEventListener("click",function(){if(b.k==="extra"){S.momWeek=S.momWeek||{};S.momWeek[id]=!S.momWeek[id];}else md.done[id]=!md.done[id];save();renderMom();});
+        ul.appendChild(el("li")).appendChild(bt);});
+      hd.appendChild(el("small",null,cnt+" / "+b.t.length));wrap.appendChild(hd);wrap.appendChild(ul);box.appendChild(wrap);});
+    var own=$("#momOwn");own.textContent="";md.own.forEach(function(o){total++;if(o.on)done++;var bt=el("button","mt"+(o.on?" on":""));bt.appendChild(el("span","mb",o.on?"✓":""));bt.appendChild(document.createTextNode(o.t));
+      var x=el("span","x","✕");x.addEventListener("click",function(e){e.stopPropagation();md.own=md.own.filter(function(q){return q!==o;});save();renderMom();});bt.appendChild(x);
+      bt.addEventListener("click",function(){o.on=!o.on;save();renderMom();});own.appendChild(el("li")).appendChild(bt);});
+    var pct=total?Math.round(done/total*100):0,was=$("#momPct").textContent;$("#momPct").textContent=pct+"%";$("#momArc").style.strokeDashoffset=106.8*(1-pct/100);
+    if(pct===100&&was!=="100%"&&was!=="0%"){burst("All done today!","You're amazing 💕","#C2577A");confetti("#C2577A");}}
+  $("#momAdd").addEventListener("submit",function(e){e.preventDefault();var i=$("input",this),t=i.value.trim();if(!t)return;momDay().own.push({t:t,on:false});i.value="";save();renderMom();});
+  $("#momDinner").addEventListener("click",function(){var dow=new Date().getDay(),cur=$("#momDinner").textContent,v=prompt("What's for dinner tonight?",cur);if(v===null)return;v=v.trim();
+    if(!v)return;var always=confirm("Use \""+v+"\" every "+DAYS[dow]+"?\n\nOK = every week · Cancel = just tonight");
+    if(always){S.momDin=S.momDin||{};S.momDin[dow]=v;delete momDay().din[dow];}else momDay().din[dow]=v;save();renderMom();});
+  function setBoard(b){document.body.classList.toggle("mommode",b==="mom");$$(".mtab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-board")===b);});
+    try{sessionStorage.setItem("bhqBoard",b);}catch(e){}if(b==="mom")renderMom();window.scrollTo(0,0);}
+  $$(".mtab").forEach(function(x){x.addEventListener("click",function(){setBoard(x.getAttribute("data-board"));});});
+  var momIdle;document.addEventListener("pointerdown",function(){clearTimeout(momIdle);if(document.body.classList.contains("mommode"))momIdle=setTimeout(function(){setBoard("kids");},15*60000);},true);
+  setInterval(function(){if(document.body.classList.contains("mommode"))renderMom();},60000);
 
   window.__calReady=1;renderEx();loadWx();window.__remReady=1;showSnd();checkReminders(new Date());setTab("todo");applyTheme();renderCounts();renderNotes();tick();renderXP();renderCal();$("#capTxt").textContent=S.cap;
   setInterval(tick,1000);
